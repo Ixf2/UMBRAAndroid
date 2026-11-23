@@ -1,8 +1,9 @@
-
 package com.example.umbra.network
 
+import com.example.umbra.models.LoginRequest
 import com.example.umbra.models.Personaje
 import com.example.umbra.models.PersonajeRequest
+import com.example.umbra.models.Usuario
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -12,6 +13,17 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
+
+    @POST("api/auth/login")
+    suspend fun login(
+        @Body credenciales: LoginRequest
+    ): Response<Usuario>
+
+    @GET("api/auth/me")
+    suspend fun obtenerSesion(): Response<Usuario>
+
+    @POST("api/auth/logout")
+    suspend fun logout(): Response<Unit>
 
     @GET("api/personajes/publicos")
     suspend fun obtenerPublicos(): Response<List<Personaje>>
@@ -40,4 +52,3 @@ interface ApiService {
         @Path("id") id: Int
     ): Response<Unit>
 }
-

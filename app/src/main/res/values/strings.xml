@@ -4,6 +4,16 @@
     <string name="button_abrir_Biblioteca">Abrir biblioteca</string>
     <string name="button_biblioteca_personaje">Abrir la biblioteca de personajes</string>
     <string name="textview_BibliotecaUmbra">Biblioteca de UMBRA</string>
-<string name="button_cargar_personajesPublicos">Cargar personajes públicos</string>
-<string name="textview_pulsar_button_para_cargar">Pulsa el botón para consultar el servidor.</string>
+    <string name="button_cargar_personajesPublicos">Cargar personajes públicos</string>
+    <string name="textview_pulsar_button_para_cargar">Pulsa el botón para consultar el servidor.</string>
+
+    <string name="hint_correoElectronico">Correo electrónico</string>
+    <string name="hint_contraseña">Contraseña</string>
+    <string name="button_inicioSesión">Inicio Sesión</string>
+    <string name="button_continuarInvitado">Continuar como invitado</string>
+
+
+
+
+
 </resources>

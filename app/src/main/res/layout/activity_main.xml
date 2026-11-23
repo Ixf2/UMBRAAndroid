@@ -1,37 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp"
+    android:fillViewport="true"
     android:background="#101518">
 
-    <TextView
-        android:id="@+id/tituloUmbra"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="#FFFFFF"
-        android:textSize="36sp"
-        android:textStyle="bold"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:gravity="center"
-        android:layout_marginBottom="12dp" />
+        android:padding="24dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/textview_biblioteca"
-        android:textColor="#C0C8CC"
-        android:textSize="16sp"
-        android:gravity="center"
-        android:layout_marginBottom="40dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="#FFFFFF"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/btnBiblioteca"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_abrir_Biblioteca"
-        android:contentDescription="@string/button_biblioteca_personaje" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textview_biblioteca"
+            android:textColor="#C0C8CC"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginBottom="32dp" />
 
-</LinearLayout>
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_correoElectronico"
+            android:inputType="textEmailAddress"
+            android:singleLine="true"
+            android:autofillHints="emailAddress"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#A8B2B8"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_contraseña"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:autofillHints="password"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#A8B2B8"
+            android:layout_marginBottom="20dp" />
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_inicioSesión" />
+
+        <TextView
+            android:id="@+id/txtLoginEstado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#C4CFD5"
+            android:gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp" />
+
+        <Button
+            android:id="@+id/btnBiblioteca"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_continuarInvitado" />
+
+    </LinearLayout>
+
+</ScrollView>
