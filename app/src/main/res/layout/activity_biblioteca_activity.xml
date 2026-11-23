@@ -10,24 +10,47 @@
         android:id="@+id/tituloBiblioteca"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/textview_BibliotecaUmbra"
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         android:textStyle="bold" />
 
+
     <Button
-        android:id="@+id/btnCargarPersonajes"
+        android:id="@+id/btnCrearPersonaje"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_cargar_personajesPublicos" />
+        android:text="@string/button_crear_personaje"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnVolver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_volver_inicio" />
+
+    <Button
+        android:id="@+id/btnCerrarSesion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_cerrar_sesion"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnIrLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_ir_login"
+        android:visibility="gone" />
+
 
     <TextView
         android:id="@+id/txtEstado"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
         android:text="@string/textview_pulsar_button_para_cargar"
         android:textColor="#C4CFD5" />
 

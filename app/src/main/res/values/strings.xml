@@ -11,6 +11,12 @@
     <string name="hint_contraseña">Contraseña</string>
     <string name="button_inicioSesión">Inicio Sesión</string>
     <string name="button_continuarInvitado">Continuar como invitado</string>
+    <string name="button_volver_inicio">Volver al inicio</string>
+    <string name="button_ir_login">Iniciar sesión</string>
+    <string name="button_cerrar_sesion">Cerrar sesión</string>
+    <string name="button_crear_personaje">Crear personaje</string>
+
+
 
 
 
