@@ -15,13 +15,35 @@
     <string name="button_ir_login">Iniciar sesión</string>
     <string name="button_cerrar_sesion">Cerrar sesión</string>
     <string name="button_crear_personaje">Crear personaje</string>
+    <string name="button_cargar_personajes">Cargar personajes</string>
 
     <string name="personaje_clase_raza">%1$s · %2$s</string>
     <string name="personaje_nivel_visibilidad">Nivel %1$d · %2$s</string>
     <string name="personaje_estadisticas">FUE %1$d   DES %2$d   INT %3$d   CAR %4$d</string>
 
 
+    <string name="detalle_historia">Historia</string>
+    <string name="detalle_personalidad">Personalidad</string>
+    <string name="detalle_estadisticas">Estadísticas</string>
+    <string name="detalle_editar_personaje">Editar personaje</string>
+    <string name="detalle_eliminar_personaje">Eliminar personaje</string>
+    <string name="detalle_volver_biblioteca">Volver a la biblioteca</string>
 
+
+
+    <string name="detalle_personaje_invalido">Personaje no válido</string>
+    <string name="detalle_cargando_personaje">Cargando personaje...</string>
+    <string name="detalle_no_encontrado">Personaje no encontrado</string>
+    <string name="detalle_sesion_requerida">Debes iniciar sesión</string>
+    <string name="detalle_sin_permisos">No tienes permiso para consultar este personaje</string>
+    <string name="detalle_error_http">Error HTTP: %1$d</string>
+    <string name="detalle_error_conexion">Error de conexión: %1$s</string>
+    <string name="detalle_valores_estadisticas">Fuerza: %1$d
+Destreza: %2$d
+Inteligencia: %3$d
+Carisma: %4$d</string>
+    <string name="sin_clase">Sin clase</string>
+    <string name="sin_raza">Sin raza</string>
 
 
 

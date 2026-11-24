@@ -10,12 +10,34 @@
         android:id="@+id/tituloBiblioteca"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="12dp"
         android:text="@string/textview_BibliotecaUmbra"
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/txtEstado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:text="@string/textview_pulsar_button_para_cargar"
+        android:textColor="#C4CFD5" />
+
+    <Button
+        android:id="@+id/btnCargarPersonajes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/button_cargar_personajes" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerPersonajes"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp" />
 
     <Button
         android:id="@+id/btnCrearPersonaje"
@@ -43,23 +65,5 @@
         android:layout_height="wrap_content"
         android:text="@string/button_ir_login"
         android:visibility="gone" />
-
-
-    <TextView
-        android:id="@+id/txtEstado"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        android:text="@string/textview_pulsar_button_para_cargar"
-        android:textColor="#C4CFD5" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerPersonajes"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="12dp" />
 
 </LinearLayout>

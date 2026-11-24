@@ -21,7 +21,23 @@ class BibliotecaActivity : AppCompatActivity() {
 
     private val repository = PersonajeRepository()
     private val api = RetrofitClient.apiService
-    private val adapter = PersonajeAdapter()
+
+
+    private val adapter = PersonajeAdapter(
+        onPersonajeClick = { personaje ->
+            val intent = Intent(
+                this,
+                DetallePersonajeActivity::class.java
+            )
+
+            intent.putExtra("idPersonaje", personaje.idPersonaje)
+            intent.putExtra("puedeEditar", mostrarMisPersonajes)
+
+            crearPersonajeLauncher.launch(intent)
+        }
+    )
+
+
 
     private lateinit var btnCargar: Button
     private lateinit var txtEstado: TextView
