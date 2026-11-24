@@ -1,4 +1,3 @@
-
 package com.example.umbra.adapters
 
 import android.view.LayoutInflater
@@ -10,7 +9,8 @@ import com.example.umbra.R
 import com.example.umbra.models.Personaje
 
 class PersonajeAdapter(
-    private val personajes: MutableList<Personaje> = mutableListOf()
+    private val personajes: MutableList<Personaje> = mutableListOf(),
+    private val onPersonajeClick: (Personaje) -> Unit = {}
 ) : RecyclerView.Adapter<PersonajeAdapter.PersonajeViewHolder>() {
 
     class PersonajeViewHolder(itemView: View) :
@@ -45,20 +45,33 @@ class PersonajeAdapter(
         position: Int
     ) {
         val personaje = personajes[position]
+        val context = holder.itemView.context
 
         holder.nombre.text = personaje.nombre
 
-        holder.claseRaza.text =
-            "${personaje.clase ?: "Sin clase"} · ${personaje.raza ?: "Sin raza"}"
+        holder.claseRaza.text = context.getString(
+            R.string.personaje_clase_raza,
+            personaje.clase ?: "Sin clase",
+            personaje.raza ?: "Sin raza"
+        )
 
-        holder.nivelVisibilidad.text =
-            "Nivel ${personaje.nivel} · ${personaje.visibilidad}"
+        holder.nivelVisibilidad.text = context.getString(
+            R.string.personaje_nivel_visibilidad,
+            personaje.nivel,
+            personaje.visibilidad
+        )
 
-        holder.estadisticas.text =
-            "FUE ${personaje.fuerza}   " +
-                    "DES ${personaje.destreza}   " +
-                    "INT ${personaje.inteligencia}   " +
-                    "CAR ${personaje.carisma}"
+        holder.estadisticas.text = context.getString(
+            R.string.personaje_estadisticas,
+            personaje.fuerza,
+            personaje.destreza,
+            personaje.inteligencia,
+            personaje.carisma
+        )
+
+        holder.itemView.setOnClickListener {
+            onPersonajeClick(personaje)
+        }
     }
 
     override fun getItemCount(): Int = personajes.size

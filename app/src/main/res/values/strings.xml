@@ -16,6 +16,10 @@
     <string name="button_cerrar_sesion">Cerrar sesión</string>
     <string name="button_crear_personaje">Crear personaje</string>
 
+    <string name="personaje_clase_raza">%1$s · %2$s</string>
+    <string name="personaje_nivel_visibilidad">Nivel %1$d · %2$s</string>
+    <string name="personaje_estadisticas">FUE %1$d   DES %2$d   INT %3$d   CAR %4$d</string>
+
 
 
 
