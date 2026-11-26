@@ -2,6 +2,7 @@
 package com.example.umbra.activities
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -22,9 +23,11 @@ class DetallePersonajeActivity : AppCompatActivity() {
 
   private var idPersonaje = -1
   private var puedeEditar = false
+  private var nombrePersonaje = ""
 
   private lateinit var txtEstado: TextView
   private lateinit var btnEditar: Button
+  private lateinit var btnEliminar: Button
 
   private val editarLauncher = registerForActivityResult(
     ActivityResultContracts.StartActivityForResult()
@@ -44,10 +47,7 @@ class DetallePersonajeActivity : AppCompatActivity() {
 
     txtEstado = findViewById(R.id.txtEstadoDetalle)
     btnEditar = findViewById(R.id.btnEditarPersonaje)
-
-    val btnEliminar = findViewById<Button>(
-      R.id.btnEliminarPersonaje
-    )
+    btnEliminar = findViewById(R.id.btnEliminarPersonaje)
 
     val btnVolver = findViewById<Button>(
       R.id.btnVolverDetalle
@@ -72,6 +72,12 @@ class DetallePersonajeActivity : AppCompatActivity() {
       }
     }
 
+    btnEliminar.setOnClickListener {
+      if (puedeEditar && idPersonaje != -1) {
+        confirmarEliminacion()
+      }
+    }
+
     if (idPersonaje == -1) {
       txtEstado.text = getString(
         R.string.detalle_personaje_invalido
@@ -84,6 +90,7 @@ class DetallePersonajeActivity : AppCompatActivity() {
 
   private fun cargarPersonaje() {
     btnEditar.visibility = View.GONE
+    btnEliminar.visibility = View.GONE
 
     lifecycleScope.launch {
       txtEstado.text = getString(
@@ -102,11 +109,10 @@ class DetallePersonajeActivity : AppCompatActivity() {
             mostrarPersonaje(personaje)
 
             btnEditar.visibility =
-              if (puedeEditar) {
-                View.VISIBLE
-              } else {
-                View.GONE
-              }
+              if (puedeEditar) View.VISIBLE else View.GONE
+
+            btnEliminar.visibility =
+              if (puedeEditar) View.VISIBLE else View.GONE
 
             txtEstado.text = ""
           } else {
@@ -134,7 +140,6 @@ class DetallePersonajeActivity : AppCompatActivity() {
             )
           }
         }
-
       } catch (e: CancellationException) {
         throw e
       } catch (e: Exception) {
@@ -146,7 +151,80 @@ class DetallePersonajeActivity : AppCompatActivity() {
     }
   }
 
+  private fun confirmarEliminacion() {
+    AlertDialog.Builder(this)
+      .setTitle(R.string.eliminar_confirmacion_titulo)
+      .setMessage(
+        getString(
+          R.string.eliminar_confirmacion_mensaje,
+          nombrePersonaje
+        )
+      )
+      .setNegativeButton(
+        R.string.eliminar_cancelar,
+        null
+      )
+      .setPositiveButton(
+        R.string.eliminar_confirmar
+      ) { _, _ ->
+        eliminarPersonaje()
+      }
+      .show()
+  }
+
+  private fun eliminarPersonaje() {
+    lifecycleScope.launch {
+      btnEditar.isEnabled = false
+      btnEliminar.isEnabled = false
+
+      txtEstado.text = getString(
+        R.string.eliminar_procesando
+      )
+
+      try {
+        val respuesta = repository.eliminarPersonaje(
+          idPersonaje
+        )
+
+        if (respuesta.isSuccessful) {
+          setResult(Activity.RESULT_OK)
+          finish()
+        } else {
+          txtEstado.text = when (respuesta.code()) {
+            401 -> getString(
+              R.string.detalle_sesion_requerida
+            )
+
+            403 -> getString(
+              R.string.detalle_sin_permisos
+            )
+
+            404 -> getString(
+              R.string.detalle_no_encontrado
+            )
+
+            else -> getString(
+              R.string.detalle_error_http,
+              respuesta.code()
+            )
+          }
+        }
+      } catch (e: CancellationException) {
+        throw e
+      } catch (e: Exception) {
+        txtEstado.text = getString(
+          R.string.detalle_error_conexion,
+          e.localizedMessage ?: ""
+        )
+      } finally {
+        btnEditar.isEnabled = true
+        btnEliminar.isEnabled = true
+      }
+    }
+  }
+
   private fun mostrarPersonaje(personaje: Personaje) {
+    nombrePersonaje = personaje.nombre
 
     findViewById<TextView>(
       R.id.txtNombreDetalle

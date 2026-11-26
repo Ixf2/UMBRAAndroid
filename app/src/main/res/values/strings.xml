@@ -46,6 +46,12 @@ Carisma: %4$d</string>
     <string name="sin_raza">Sin raza</string>
 
 
+    <string name="eliminar_confirmacion_titulo">Eliminar personaje</string>
+    <string name="eliminar_confirmacion_mensaje">¿Quieres eliminar a %1$s? Esta acción no se puede deshacer.</string>
+    <string name="eliminar_cancelar">Cancelar</string>
+    <string name="eliminar_confirmar">Eliminar definitivamente</string>
+    <string name="eliminar_procesando">Eliminando personaje...</string>
+
 
 
 </resources>

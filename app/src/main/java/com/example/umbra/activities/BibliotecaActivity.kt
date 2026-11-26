@@ -30,8 +30,15 @@ class BibliotecaActivity : AppCompatActivity() {
                 DetallePersonajeActivity::class.java
             )
 
-            intent.putExtra("idPersonaje", personaje.idPersonaje)
-            intent.putExtra("puedeEditar", mostrarMisPersonajes)
+            intent.putExtra(
+                "idPersonaje",
+                personaje.idPersonaje
+            )
+
+            intent.putExtra(
+                "puedeEditar",
+                mostrarMisPersonajes
+            )
 
             crearPersonajeLauncher.launch(intent)
         }
