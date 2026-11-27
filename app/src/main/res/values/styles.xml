@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="UmbraBotonPrincipal">
+        <item name="android:backgroundTint">@color/umbra_primary</item>
+        <item name="android:textColor">@color/umbra_on_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="UmbraBotonSecundario">
+        <item name="android:backgroundTint">@color/umbra_surface_variant</item>
+        <item name="android:textColor">@color/umbra_text</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="UmbraBotonEliminar">
+        <item name="android:backgroundTint">@color/umbra_error</item>
+        <item name="android:textColor">@color/umbra_background</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="UmbraTitulo">
+        <item name="android:textColor">@color/umbra_primary</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="UmbraSubtitulo">
+        <item name="android:textColor">@color/umbra_text</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="UmbraTexto">
+        <item name="android:textColor">@color/umbra_text</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="UmbraTextoSecundario">
+        <item name="android:textColor">@color/umbra_text_secondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+</resources>

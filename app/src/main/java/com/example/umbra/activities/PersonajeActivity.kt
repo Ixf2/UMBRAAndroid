@@ -24,9 +24,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,82 +35,79 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import com.example.umbra.models.Personaje
 import com.example.umbra.models.PersonajeRequest
-import com.example.umbra.repository.PersonajeRepository
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
+import com.example.umbra.viewmodel.FormularioPersonajeViewModel
 
 class PersonajeActivity : ComponentActivity() {
 
-    private val repository = PersonajeRepository()
+    private lateinit var viewModel: FormularioPersonajeViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel = ViewModelProvider(this)[
+            FormularioPersonajeViewModel::class.java
+        ]
+
         val idPersonaje = intent.getIntExtra("idPersonaje", -1)
         val esEdicion = idPersonaje != -1
+
+        viewModel.cargarPersonaje(idPersonaje)
 
         setContent {
             MaterialTheme(colorScheme = darkColorScheme()) {
 
-                var guardando by rememberSaveable {
-                    mutableStateOf(false)
-                }
+                val personaje by viewModel.personaje.collectAsState()
+                val cargando by viewModel.cargando.collectAsState()
+                val guardando by viewModel.guardando.collectAsState()
+                val mensaje by viewModel.mensaje.collectAsState()
+                val guardado by viewModel.guardado.collectAsState()
 
-                var mensaje by rememberSaveable {
-                    mutableStateOf("")
-                }
-
-                var personajeExistente by remember {
-                    mutableStateOf<Personaje?>(null)
-                }
-
-                var cargando by remember {
-                    mutableStateOf(esEdicion)
-                }
-
-                LaunchedEffect(idPersonaje) {
-                    if (esEdicion) {
-                        try {
-                            val respuesta =
-                                repository.obtenerPersonaje(idPersonaje)
-
-                            if (respuesta.isSuccessful) {
-                                personajeExistente = respuesta.body()
-
-                                if (personajeExistente == null) {
-                                    mensaje = "Personaje no encontrado"
-                                }
-                            } else {
-                                mensaje = "Error HTTP: ${respuesta.code()}"
-                            }
-
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            mensaje = "Error: ${e.localizedMessage}"
-                        } finally {
-                            cargando = false
-                        }
+                LaunchedEffect(guardado) {
+                    if (guardado) {
+                        setResult(Activity.RESULT_OK)
+                        finish()
                     }
                 }
 
                 when {
                     cargando -> {
-                        Text("Cargando personaje...")
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color(0xFF101518))
+                                .padding(20.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Cargando personaje...",
+                                color = Color.White
+                            )
+                        }
                     }
 
-                    esEdicion && personajeExistente == null -> {
-                        Column {
+                    esEdicion && personaje == null -> {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color(0xFF101518))
+                                .padding(20.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             Text(
-                                mensaje.ifBlank {
+                                text = mensaje.ifBlank {
                                     "No se puede cargar el personaje"
-                                }
+                                },
+                                color = Color.White
                             )
 
-                            TextButton(onClick = { finish() }) {
+                            TextButton(
+                                onClick = { finish() }
+                            ) {
                                 Text("Volver")
                             }
                         }
@@ -118,51 +115,17 @@ class PersonajeActivity : ComponentActivity() {
 
                     else -> {
                         FormularioPersonaje(
-                            personajeInicial = personajeExistente,
+                            personajeInicial = personaje,
                             guardando = guardando,
                             mensaje = mensaje,
-                            onVolver = { finish() },
-                            onGuardar = { personaje ->
-
-                                if (!guardando) {
-                                    guardando = true
-                                    mensaje = "Guardando personaje..."
-
-                                    lifecycleScope.launch {
-                                        try {
-                                            val respuesta = if (esEdicion) {
-                                                repository.actualizarPersonaje(
-                                                    idPersonaje,
-                                                    personaje
-                                                )
-                                            } else {
-                                                repository.crearPersonaje(
-                                                    personaje
-                                                )
-                                            }
-
-                                            if (respuesta.isSuccessful) {
-                                                setResult(Activity.RESULT_OK)
-                                                finish()
-                                            } else {
-                                                mensaje = when (respuesta.code()) {
-                                                    400 -> "Datos incorrectos"
-                                                    401 -> "Debes iniciar sesión"
-                                                    403 -> "No tienes permisos"
-                                                    404 -> "Personaje no encontrado"
-                                                    else -> "Error HTTP: ${respuesta.code()}"
-                                                }
-                                            }
-
-                                        } catch (e: CancellationException) {
-                                            throw e
-                                        } catch (e: Exception) {
-                                            mensaje = "Error: ${e.localizedMessage}"
-                                        } finally {
-                                            guardando = false
-                                        }
-                                    }
-                                }
+                            onVolver = {
+                                finish()
+                            },
+                            onGuardar = { datos ->
+                                viewModel.guardarPersonaje(
+                                    idPersonaje,
+                                    datos
+                                )
                             }
                         )
                     }
@@ -206,27 +169,39 @@ fun FormularioPersonaje(
     }
 
     var nivel by rememberSaveable {
-        mutableStateOf((personajeInicial?.nivel ?: 1).toString())
+        mutableStateOf(
+            (personajeInicial?.nivel ?: 1).toString()
+        )
     }
 
     var fuerza by rememberSaveable {
-        mutableStateOf((personajeInicial?.fuerza ?: 10).toString())
+        mutableStateOf(
+            (personajeInicial?.fuerza ?: 10).toString()
+        )
     }
 
     var destreza by rememberSaveable {
-        mutableStateOf((personajeInicial?.destreza ?: 10).toString())
+        mutableStateOf(
+            (personajeInicial?.destreza ?: 10).toString()
+        )
     }
 
     var inteligencia by rememberSaveable {
-        mutableStateOf((personajeInicial?.inteligencia ?: 10).toString())
+        mutableStateOf(
+            (personajeInicial?.inteligencia ?: 10).toString()
+        )
     }
 
     var carisma by rememberSaveable {
-        mutableStateOf((personajeInicial?.carisma ?: 10).toString())
+        mutableStateOf(
+            (personajeInicial?.carisma ?: 10).toString()
+        )
     }
 
     var publico by rememberSaveable {
-        mutableStateOf(personajeInicial?.visibilidad == "publico")
+        mutableStateOf(
+            personajeInicial?.visibilidad == "publico"
+        )
     }
 
     var errorFormulario by rememberSaveable {
@@ -258,14 +233,49 @@ fun FormularioPersonaje(
             color = Color.White
         )
 
-        CampoTexto("Nombre", nombre, { nombre = it }, 50)
-        CampoTexto("Historia", historia, { historia = it })
-        CampoTexto("Personalidad", personalidad, { personalidad = it })
-        CampoTexto("Clase", clase, { clase = it }, 50)
-        CampoTexto("Raza", raza, { raza = it }, 50)
-        CampoTexto("Origen", origen, { origen = it }, 100)
+        CampoTexto(
+            "Nombre",
+            nombre,
+            { nombre = it },
+            50
+        )
 
-        CampoNumero("Nivel", nivel) { nivel = it }
+        CampoTexto(
+            "Historia",
+            historia,
+            { historia = it }
+        )
+
+        CampoTexto(
+            "Personalidad",
+            personalidad,
+            { personalidad = it }
+        )
+
+        CampoTexto(
+            "Clase",
+            clase,
+            { clase = it },
+            50
+        )
+
+        CampoTexto(
+            "Raza",
+            raza,
+            { raza = it },
+            50
+        )
+
+        CampoTexto(
+            "Origen",
+            origen,
+            { origen = it },
+            100
+        )
+
+        CampoNumero("Nivel", nivel) {
+            nivel = it
+        }
 
         Text(
             text = "Estadísticas",
@@ -273,10 +283,21 @@ fun FormularioPersonaje(
             color = Color.White
         )
 
-        CampoNumero("Fuerza", fuerza) { fuerza = it }
-        CampoNumero("Destreza", destreza) { destreza = it }
-        CampoNumero("Inteligencia", inteligencia) { inteligencia = it }
-        CampoNumero("Carisma", carisma) { carisma = it }
+        CampoNumero("Fuerza", fuerza) {
+            fuerza = it
+        }
+
+        CampoNumero("Destreza", destreza) {
+            destreza = it
+        }
+
+        CampoNumero("Inteligencia", inteligencia) {
+            inteligencia = it
+        }
+
+        CampoNumero("Carisma", carisma) {
+            carisma = it
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -295,7 +316,10 @@ fun FormularioPersonaje(
 
             Switch(
                 checked = publico,
-                onCheckedChange = { publico = it }
+                onCheckedChange = {
+                    publico = it
+                },
+                enabled = !guardando
             )
         }
 
@@ -325,6 +349,7 @@ fun FormularioPersonaje(
                 )
 
                 errorFormulario = when {
+
                     nombre.isBlank() ->
                         "Introduce el nombre del personaje"
 
@@ -334,7 +359,9 @@ fun FormularioPersonaje(
                     personalidad.isBlank() ->
                         "Introduce la personalidad"
 
-                    estadisticas.any { it == null || it !in 1..20 } ->
+                    estadisticas.any {
+                        it == null || it !in 1..20
+                    } ->
                         "El nivel y las estadísticas deben estar entre 1 y 20"
 
                     else -> ""
@@ -357,14 +384,18 @@ fun FormularioPersonaje(
                             } else {
                                 "privado"
                             },
-                            idCategoria = personajeInicial?.idCategoria ?: 1,
+                            idCategoria =
+                                personajeInicial?.idCategoria ?: 1,
                             clase = clase.trim().ifBlank { null },
                             raza = raza.trim().ifBlank { null },
                             nivel = nivel.toInt(),
                             origen = origen.trim().ifBlank { null },
-                            rasgos = personajeInicial?.rasgos.orEmpty(),
-                            retrato = personajeInicial?.retrato ?: 2,
-                            favorito = personajeInicial?.favorito ?: false
+                            rasgos =
+                                personajeInicial?.rasgos.orEmpty(),
+                            retrato =
+                                personajeInicial?.retrato ?: 2,
+                            favorito =
+                                personajeInicial?.favorito ?: false
                         )
                     )
                 }
@@ -375,9 +406,14 @@ fun FormularioPersonaje(
 
             Text(
                 when {
-                    guardando -> "Guardando..."
-                    personajeInicial != null -> "Actualizar personaje"
-                    else -> "Guardar personaje"
+                    guardando ->
+                        "Guardando..."
+
+                    personajeInicial != null ->
+                        "Actualizar personaje"
+
+                    else ->
+                        "Guardar personaje"
                 }
             )
         }
@@ -399,6 +435,7 @@ fun CampoTexto(
     onCambio: (String) -> Unit,
     maxCaracteres: Int = Int.MAX_VALUE
 ) {
+
     OutlinedTextField(
         value = valor,
         onValueChange = {
@@ -406,7 +443,9 @@ fun CampoTexto(
                 onCambio(it)
             }
         },
-        label = { Text(etiqueta) },
+        label = {
+            Text(etiqueta)
+        },
         modifier = Modifier.fillMaxWidth()
     )
 }
@@ -417,6 +456,7 @@ fun CampoNumero(
     valor: String,
     onCambio: (String) -> Unit
 ) {
+
     OutlinedTextField(
         value = valor,
         onValueChange = {
@@ -424,7 +464,9 @@ fun CampoNumero(
                 onCambio(it)
             }
         },
-        label = { Text(etiqueta) },
+        label = {
+            Text(etiqueta)
+        },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number
         ),

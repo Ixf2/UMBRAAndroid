@@ -2,4 +2,21 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+    <color name="umbra_background">#101518</color>
+    <color name="umbra_surface">#1B2428</color>
+    <color name="umbra_surface_variant">#253236</color>
+    <color name="umbra_primary">#C5A572</color>
+    <color name="umbra_primary_dark">#917447</color>
+    <color name="umbra_on_primary">#101518</color>
+    <color name="umbra_text">#F1EDE5</color>
+    <color name="umbra_text_secondary">#C4CFD5</color>
+    <color name="umbra_border">#405054</color>
+    <color name="umbra_error">#D97070</color>
+    <color name="umbra_success">#81B29A</color>
+
+
+
+
 </resources>
