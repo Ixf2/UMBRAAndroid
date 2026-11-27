@@ -10,37 +10,41 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.umbra.R
 import com.example.umbra.models.Personaje
-import com.example.umbra.repository.PersonajeRepository
-import kotlinx.coroutines.CancellationException
+import com.example.umbra.viewmodel.DetallePersonajeViewModel
 import kotlinx.coroutines.launch
 
 class DetallePersonajeActivity : AppCompatActivity() {
 
-  private val repository = PersonajeRepository()
-
-  private var idPersonaje = -1
-  private var puedeEditar = false
-  private var nombrePersonaje = ""
-
+  private lateinit var viewModel: DetallePersonajeViewModel
   private lateinit var txtEstado: TextView
   private lateinit var btnEditar: Button
   private lateinit var btnEliminar: Button
+
+  private var idPersonaje = -1
+  private var puedeEditar = false
 
   private val editarLauncher = registerForActivityResult(
     ActivityResultContracts.StartActivityForResult()
   ) { resultado ->
     if (resultado.resultCode == Activity.RESULT_OK) {
       setResult(Activity.RESULT_OK)
-      cargarPersonaje()
+      viewModel.cargarPersonaje(idPersonaje)
     }
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_detalle_personaje)
+
+    viewModel = ViewModelProvider(this)[
+      DetallePersonajeViewModel::class.java
+    ]
 
     idPersonaje = intent.getIntExtra("idPersonaje", -1)
     puedeEditar = intent.getBooleanExtra("puedeEditar", false)
@@ -85,146 +89,68 @@ class DetallePersonajeActivity : AppCompatActivity() {
       return
     }
 
-    cargarPersonaje()
+    observarViewModel()
+
+    if (savedInstanceState == null) {
+      viewModel.cargarPersonaje(idPersonaje)
+    }
   }
 
-  private fun cargarPersonaje() {
-    btnEditar.visibility = View.GONE
-    btnEliminar.visibility = View.GONE
-
+  private fun observarViewModel() {
     lifecycleScope.launch {
-      txtEstado.text = getString(
-        R.string.detalle_cargando_personaje
-      )
+      repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-      try {
-        val respuesta = repository.obtenerPersonaje(
-          idPersonaje
-        )
-
-        if (respuesta.isSuccessful) {
-          val personaje = respuesta.body()
-
-          if (personaje != null) {
-            mostrarPersonaje(personaje)
-
-            btnEditar.visibility =
-              if (puedeEditar) View.VISIBLE else View.GONE
-
-            btnEliminar.visibility =
-              if (puedeEditar) View.VISIBLE else View.GONE
-
-            txtEstado.text = ""
-          } else {
-            txtEstado.text = getString(
-              R.string.detalle_no_encontrado
-            )
-          }
-        } else {
-          txtEstado.text = when (respuesta.code()) {
-            401 -> getString(
-              R.string.detalle_sesion_requerida
-            )
-
-            403 -> getString(
-              R.string.detalle_sin_permisos
-            )
-
-            404 -> getString(
-              R.string.detalle_no_encontrado
-            )
-
-            else -> getString(
-              R.string.detalle_error_http,
-              respuesta.code()
-            )
+        launch {
+          viewModel.personaje.collect { personaje ->
+            if (personaje != null) {
+              mostrarPersonaje(personaje)
+            } else {
+              btnEditar.visibility = View.GONE
+              btnEliminar.visibility = View.GONE
+            }
           }
         }
-      } catch (e: CancellationException) {
-        throw e
-      } catch (e: Exception) {
-        txtEstado.text = getString(
-          R.string.detalle_error_conexion,
-          e.localizedMessage ?: ""
-        )
+
+        launch {
+          viewModel.mensaje.collect { mensaje ->
+            txtEstado.text = mensaje
+          }
+        }
+
+        launch {
+          viewModel.cargando.collect { cargando ->
+            actualizarBotones()
+          }
+        }
+
+        launch {
+          viewModel.eliminando.collect { eliminando ->
+            actualizarBotones()
+          }
+        }
       }
     }
   }
 
-  private fun confirmarEliminacion() {
-    AlertDialog.Builder(this)
-      .setTitle(R.string.eliminar_confirmacion_titulo)
-      .setMessage(
-        getString(
-          R.string.eliminar_confirmacion_mensaje,
-          nombrePersonaje
-        )
-      )
-      .setNegativeButton(
-        R.string.eliminar_cancelar,
-        null
-      )
-      .setPositiveButton(
-        R.string.eliminar_confirmar
-      ) { _, _ ->
-        eliminarPersonaje()
-      }
-      .show()
-  }
+  private fun actualizarBotones() {
+    val disponible =
+      viewModel.personaje.value != null &&
+          !viewModel.cargando.value &&
+          !viewModel.eliminando.value
 
-  private fun eliminarPersonaje() {
-    lifecycleScope.launch {
-      btnEditar.isEnabled = false
-      btnEliminar.isEnabled = false
+    val visible = puedeEditar && disponible
 
-      txtEstado.text = getString(
-        R.string.eliminar_procesando
-      )
+    btnEditar.visibility =
+      if (visible) View.VISIBLE else View.GONE
 
-      try {
-        val respuesta = repository.eliminarPersonaje(
-          idPersonaje
-        )
+    btnEliminar.visibility =
+      if (visible) View.VISIBLE else View.GONE
 
-        if (respuesta.isSuccessful) {
-          setResult(Activity.RESULT_OK)
-          finish()
-        } else {
-          txtEstado.text = when (respuesta.code()) {
-            401 -> getString(
-              R.string.detalle_sesion_requerida
-            )
-
-            403 -> getString(
-              R.string.detalle_sin_permisos
-            )
-
-            404 -> getString(
-              R.string.detalle_no_encontrado
-            )
-
-            else -> getString(
-              R.string.detalle_error_http,
-              respuesta.code()
-            )
-          }
-        }
-      } catch (e: CancellationException) {
-        throw e
-      } catch (e: Exception) {
-        txtEstado.text = getString(
-          R.string.detalle_error_conexion,
-          e.localizedMessage ?: ""
-        )
-      } finally {
-        btnEditar.isEnabled = true
-        btnEliminar.isEnabled = true
-      }
-    }
+    btnEditar.isEnabled = disponible
+    btnEliminar.isEnabled = disponible
   }
 
   private fun mostrarPersonaje(personaje: Personaje) {
-    nombrePersonaje = personaje.nombre
 
     findViewById<TextView>(
       R.id.txtNombreDetalle
@@ -263,5 +189,43 @@ class DetallePersonajeActivity : AppCompatActivity() {
       personaje.inteligencia,
       personaje.carisma
     )
+
+    actualizarBotones()
+  }
+
+  private fun confirmarEliminacion() {
+    val personaje = viewModel.personaje.value ?: return
+
+    AlertDialog.Builder(this)
+      .setTitle(R.string.eliminar_confirmacion_titulo)
+      .setMessage(
+        getString(
+          R.string.eliminar_confirmacion_mensaje,
+          personaje.nombre
+        )
+      )
+      .setNegativeButton(
+        R.string.eliminar_cancelar,
+        null
+      )
+      .setPositiveButton(
+        R.string.eliminar_confirmar
+      ) { _, _ ->
+        eliminarPersonaje()
+      }
+      .show()
+  }
+
+  private fun eliminarPersonaje() {
+    lifecycleScope.launch {
+      val eliminado = viewModel.eliminarPersonaje(
+        idPersonaje
+      )
+
+      if (eliminado) {
+        setResult(Activity.RESULT_OK)
+        finish()
+      }
+    }
   }
 }

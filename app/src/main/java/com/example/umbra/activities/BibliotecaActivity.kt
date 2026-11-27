@@ -7,199 +7,203 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.umbra.R
 import com.example.umbra.adapters.PersonajeAdapter
 import com.example.umbra.network.RetrofitClient
-import com.example.umbra.repository.PersonajeRepository
+import com.example.umbra.viewmodel.PersonajeViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 
 class BibliotecaActivity : AppCompatActivity() {
 
-    private val repository = PersonajeRepository()
-    private val api = RetrofitClient.apiService
+  private val api = RetrofitClient.apiService
 
+  private lateinit var viewModel: PersonajeViewModel
+  private lateinit var btnCargar: Button
+  private lateinit var txtEstado: TextView
 
-    private val adapter = PersonajeAdapter(
-        onPersonajeClick = { personaje ->
-            val intent = Intent(
-                this,
-                DetallePersonajeActivity::class.java
-            )
+  private var mostrarMisPersonajes = false
 
-            intent.putExtra(
-                "idPersonaje",
-                personaje.idPersonaje
-            )
+  private val crearPersonajeLauncher = registerForActivityResult(
+    ActivityResultContracts.StartActivityForResult()
+  ) { resultado ->
+    if (resultado.resultCode == RESULT_OK) {
+      cargarPersonajes()
+    }
+  }
 
-            intent.putExtra(
-                "puedeEditar",
-                mostrarMisPersonajes
-            )
+  private val adapter = PersonajeAdapter(
+    onPersonajeClick = { personaje ->
+      val intent = Intent(
+        this,
+        DetallePersonajeActivity::class.java
+      )
 
-            crearPersonajeLauncher.launch(intent)
-        }
+      intent.putExtra(
+        "idPersonaje",
+        personaje.idPersonaje
+      )
+
+      intent.putExtra(
+        "puedeEditar",
+        mostrarMisPersonajes
+      )
+
+      crearPersonajeLauncher.launch(intent)
+    }
+  )
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_biblioteca_activity)
+
+    viewModel = ViewModelProvider(this)[PersonajeViewModel::class.java]
+
+    btnCargar = findViewById(R.id.btnCargarPersonajes)
+    txtEstado = findViewById(R.id.txtEstado)
+
+    val btnVolver = findViewById<Button>(R.id.btnVolver)
+    val btnIrLogin = findViewById<Button>(R.id.btnIrLogin)
+    val btnCerrarSesion = findViewById<Button>(R.id.btnCerrarSesion)
+    val btnCrear = findViewById<Button>(R.id.btnCrearPersonaje)
+    val titulo = findViewById<TextView>(R.id.tituloBiblioteca)
+    val recycler = findViewById<RecyclerView>(R.id.recyclerPersonajes)
+
+    mostrarMisPersonajes = intent.getBooleanExtra(
+      "mostrarMisPersonajes",
+      false
     )
 
-
-
-    private lateinit var btnCargar: Button
-    private lateinit var txtEstado: TextView
-
-    private var mostrarMisPersonajes = false
-
-    private val crearPersonajeLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { resultado ->
-        if (resultado.resultCode == RESULT_OK) {
-            cargarPersonajes()
-        }
+    titulo.text = if (mostrarMisPersonajes) {
+      "Mis personajes de UMBRA"
+    } else {
+      "Biblioteca pública de UMBRA"
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_biblioteca_activity)
+    btnCargar.text = if (mostrarMisPersonajes) {
+      "Cargar mis personajes"
+    } else {
+      "Cargar personajes públicos"
+    }
 
-        btnCargar = findViewById(R.id.btnCargarPersonajes)
-        txtEstado = findViewById(R.id.txtEstado)
+    btnIrLogin.visibility =
+      if (mostrarMisPersonajes) View.GONE else View.VISIBLE
 
-        val btnVolver = findViewById<Button>(R.id.btnVolver)
-        val btnIrLogin = findViewById<Button>(R.id.btnIrLogin)
-        val btnCerrarSesion = findViewById<Button>(R.id.btnCerrarSesion)
-        val btnCrear = findViewById<Button>(R.id.btnCrearPersonaje)
-        val titulo = findViewById<TextView>(R.id.tituloBiblioteca)
-        val recycler = findViewById<RecyclerView>(R.id.recyclerPersonajes)
+    btnCerrarSesion.visibility =
+      if (mostrarMisPersonajes) View.VISIBLE else View.GONE
 
-        mostrarMisPersonajes =
-            intent.getBooleanExtra("mostrarMisPersonajes", false)
+    btnCrear.visibility =
+      if (mostrarMisPersonajes) View.VISIBLE else View.GONE
 
-        titulo.text = if (mostrarMisPersonajes) {
-            "Mis personajes de UMBRA"
-        } else {
-            "Biblioteca pública de UMBRA"
-        }
+    recycler.layoutManager = LinearLayoutManager(this)
+    recycler.adapter = adapter
 
-        btnCargar.text = if (mostrarMisPersonajes) {
-            "Cargar mis personajes"
-        } else {
-            "Cargar personajes públicos"
-        }
+    observarViewModel()
 
-        btnIrLogin.visibility =
-            if (mostrarMisPersonajes) View.GONE else View.VISIBLE
+    btnCargar.setOnClickListener {
+      cargarPersonajes()
+    }
 
-        btnCerrarSesion.visibility =
-            if (mostrarMisPersonajes) View.VISIBLE else View.GONE
+    btnCrear.setOnClickListener {
+      val intent = Intent(
+        this,
+        PersonajeActivity::class.java
+      )
 
-        btnCrear.visibility =
-            if (mostrarMisPersonajes) View.VISIBLE else View.GONE
+      crearPersonajeLauncher.launch(intent)
+    }
 
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = adapter
+    btnVolver.setOnClickListener {
+      finish()
+    }
 
-        btnCargar.setOnClickListener {
-            cargarPersonajes()
-        }
+    btnIrLogin.setOnClickListener {
+      val intent = Intent(
+        this,
+        MainActivity::class.java
+      )
 
-        btnCrear.setOnClickListener {
-            val intent = Intent(this, PersonajeActivity::class.java)
-            crearPersonajeLauncher.launch(intent)
-        }
+      intent.flags =
+        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+            Intent.FLAG_ACTIVITY_SINGLE_TOP
 
-        btnVolver.setOnClickListener {
-            finish()
-        }
+      startActivity(intent)
+      finish()
+    }
 
-        btnIrLogin.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
+    btnCerrarSesion.setOnClickListener {
+      lifecycleScope.launch {
+        btnCerrarSesion.isEnabled = false
+        txtEstado.text = "Cerrando sesión..."
+
+        try {
+          val respuesta = api.logout()
+
+          if (respuesta.isSuccessful) {
+            val intent = Intent(
+              this@BibliotecaActivity,
+              MainActivity::class.java
+            )
 
             intent.flags =
-                Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+              Intent.FLAG_ACTIVITY_NEW_TASK or
+                  Intent.FLAG_ACTIVITY_CLEAR_TASK
 
             startActivity(intent)
             finish()
+          } else {
+            txtEstado.text =
+              "Error al cerrar sesión: ${respuesta.code()}"
+          }
+
+        } catch (e: CancellationException) {
+          throw e
+        } catch (e: Exception) {
+          txtEstado.text =
+            "Error de conexión: ${e.localizedMessage}"
+        } finally {
+          btnCerrarSesion.isEnabled = true
         }
-
-        btnCerrarSesion.setOnClickListener {
-            lifecycleScope.launch {
-                btnCerrarSesion.isEnabled = false
-                txtEstado.text = "Cerrando sesión..."
-
-                try {
-                    val respuesta = api.logout()
-
-                    if (respuesta.isSuccessful) {
-                        val intent = Intent(
-                            this@BibliotecaActivity,
-                            MainActivity::class.java
-                        )
-
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or
-                                    Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        txtEstado.text =
-                            "Error al cerrar sesión: ${respuesta.code()}"
-                    }
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    txtEstado.text =
-                        "Error de conexión: ${e.localizedMessage}"
-                } finally {
-                    btnCerrarSesion.isEnabled = true
-                }
-            }
-        }
-
-        cargarPersonajes()
+      }
     }
 
-    private fun cargarPersonajes() {
-        lifecycleScope.launch {
-            btnCargar.isEnabled = false
-            txtEstado.text = "Cargando personajes..."
+    cargarPersonajes()
+  }
 
-            try {
-                val respuesta = if (mostrarMisPersonajes) {
-                    repository.obtenerMisPersonajes()
-                } else {
-                    repository.obtenerPublicos()
-                }
 
-                if (respuesta.isSuccessful) {
-                    val personajes = respuesta.body().orEmpty()
+  private fun observarViewModel() {
+    lifecycleScope.launch {
+      repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                    adapter.actualizarPersonajes(personajes)
-
-                    txtEstado.text = if (personajes.isEmpty()) {
-                        "No hay personajes disponibles."
-                    } else {
-                        "Personajes encontrados: ${personajes.size}"
-                    }
-                } else {
-                    adapter.actualizarPersonajes(emptyList())
-
-                    txtEstado.text = when (respuesta.code()) {
-                        401, 403 -> "Debes iniciar sesión"
-                        else -> "Error HTTP: ${respuesta.code()}"
-                    }
-                }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                txtEstado.text =
-                    "Error de conexión: ${e.localizedMessage}"
-            } finally {
-                btnCargar.isEnabled = true
-            }
+        launch {
+          viewModel.personajes.collect { personajes ->
+            adapter.actualizarPersonajes(personajes)
+          }
         }
+
+        launch {
+          viewModel.mensaje.collect { mensaje ->
+            txtEstado.text = mensaje
+          }
+        }
+
+        launch {
+          viewModel.cargando.collect { cargando ->
+            btnCargar.isEnabled = !cargando
+          }
+        }
+      }
     }
+  }
+
+
+  private fun cargarPersonajes() {
+    viewModel.cargarPersonajes(mostrarMisPersonajes)
+  }
 }
