@@ -22,6 +22,54 @@
 ![UMBRA](docs/images/banner.webp)
 -->
 
+<a id="android-screenshots"></a>
+
+## Capturas Android / Android screenshots
+
+### Autenticación y registro / Authentication and registration
+
+<p align="center">
+  <img src="docs/images/android/login.png" alt="Inicio de sesión / Login" width="240">
+  <img src="docs/images/android/registro.png" alt="Registro de usuarios / User registration" width="240">
+</p>
+
+### Biblioteca personal y pública / Personal and public library
+
+<p align="center">
+  <img src="docs/images/android/biblioteca.png" alt="Biblioteca personal / Personal library" width="240">
+  <img src="docs/images/android/biblioteca_publica.png" alt="Biblioteca pública / Public library" width="240">
+</p>
+
+### Creación y generación / Creation and generation
+
+<p align="center">
+  <img src="docs/images/android/creacion_personaje.png" alt="Formulario de creación / Creation form" width="240">
+  <img src="docs/images/android/generador.png" alt="Generador de personajes / Character generator" width="240">
+</p>
+
+### Formulario cumplimentado / Completed form
+
+<p align="center">
+  <img src="docs/images/android/creacion_personaje_relleno.png" alt="Formulario completado 1 / Completed form 1" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno1.png" alt="Formulario completado 2 / Completed form 2" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno2.png" alt="Formulario completado 3 / Completed form 3" width="240">
+</p>
+
+<p align="center">
+  <img src="docs/images/android/creacion_personaje_relleno3.png" alt="Formulario completado 4 / Completed form 4" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno4.png" alt="Formulario completado 5 / Completed form 5" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno5.png" alt="Formulario completado 6 / Completed form 6" width="240">
+</p>
+
+### Edición y eliminación / Editing and deletion
+
+<p align="center">
+  <img src="docs/images/android/actualizar_personaje.png" alt="Actualizar personaje / Update character" width="240">
+  <img src="docs/images/android/eliminar_personaje.png" alt="Eliminar personaje / Delete character" width="240">
+</p>
+
+---
+
 ## Español
 
 ### 1. Descripción
@@ -169,10 +217,9 @@ Opcionalmente, configurar una herramienta externa en Android Studio (Settings �
 
 *Nota sobre el entorno ISARD:* El proyecto se ha desarrollado y probado utilizando una máquina virtual Windows alojada en ISARD. Debido a la configuración de red del entorno virtualizado, se ha utilizado ADB Reverse para establecer la comunicación entre el emulador Android y el backend Spring Boot. Esta solución evita depender de una dirección IP específica de la máquina virtual, facilitando la ejecución del proyecto en otros equipos.
 
-### 7. Capturas del proyecto
+### 7. Evidencias adicionales
 
-Las capturas Android se encuentran referenciadas mediante rutas relativas a `docs/images/android/` desde la raíz del repositorio. Las evidencias web y backend se incorporarán cuando estén disponibles.
-
+Consulta las [capturas de Android](#android-screenshots) al inicio del documento.
 
 #### Aplicación web
 
@@ -182,51 +229,6 @@ Las capturas Android se encuentran referenciadas mediante rutas relativas a `doc
 ![Detalle de personaje web](docs/images/web-detalle.webp)
 ![Diseño responsive](docs/images/web-responsive.webp)
 -->
-
-
-#### Aplicación Android
-
-##### Autenticación y registro / Authentication and registration
-
-<p align="center">
-  <img src="docs/images/android/login.png" alt="Inicio de sesión / Login" width="240">
-  <img src="docs/images/android/registro.png" alt="Registro de usuarios / User registration" width="240">
-</p>
-
-##### Biblioteca personal y pública / Personal and public library
-
-<p align="center">
-  <img src="docs/images/android/biblioteca.png" alt="Biblioteca personal / Personal library" width="240">
-  <img src="docs/images/android/biblioteca_publica.png" alt="Biblioteca pública / Public library" width="240">
-</p>
-
-##### Creación y generación / Creation and generation
-
-<p align="center">
-  <img src="docs/images/android/creacion_personaje.png" alt="Formulario de creación / Creation form" width="240">
-  <img src="docs/images/android/generador.png" alt="Generador de personajes / Character generator" width="240">
-</p>
-
-##### Formulario cumplimentado / Completed form
-
-<p align="center">
-  <img src="docs/images/android/creacion_personaje_relleno.png" alt="Formulario completado 1 / Completed form 1" width="240">
-  <img src="docs/images/android/creacion_personaje_relleno1.png" alt="Formulario completado 2 / Completed form 2" width="240">
-  <img src="docs/images/android/creacion_personaje_relleno2.png" alt="Formulario completado 3 / Completed form 3" width="240">
-</p>
-
-<p align="center">
-  <img src="docs/images/android/creacion_personaje_relleno3.png" alt="Formulario completado 4 / Completed form 4" width="240">
-  <img src="docs/images/android/creacion_personaje_relleno4.png" alt="Formulario completado 5 / Completed form 5" width="240">
-  <img src="docs/images/android/creacion_personaje_relleno5.png" alt="Formulario completado 6 / Completed form 6" width="240">
-</p>
-
-##### Edición y eliminación / Editing and deletion
-
-<p align="center">
-  <img src="docs/images/android/actualizar_personaje.png" alt="Actualizar personaje / Update character" width="240">
-  <img src="docs/images/android/eliminar_personaje.png" alt="Eliminar personaje / Delete character" width="240">
-</p>
 
 
 #### Backend y base de datos
@@ -413,9 +415,9 @@ Optionally, configure an external tool in Android Studio (Settings → Tools →
 
 *ISARD environment note:* Development and testing were carried out in a Windows virtual machine hosted on ISARD. ADB Reverse connects the Android emulator to Spring Boot without depending on a fixed virtual machine IP address.
 
-### 7. Project screenshots
+### 7. Additional evidence
 
-The screenshots are shared between both language sections. See [the screenshot gallery](#7-capturas-del-proyecto). The Android gallery uses relative paths under `docs/images/android/`. Web and backend screenshots will be added when available.
+The screenshots are shared between both language sections. See [the screenshot gallery](#android-screenshots) at the top of this README. The Android gallery uses relative paths under `docs/images/android/`. Web and backend screenshots will be added when available.
 
 ### 8. Quality, security and sustainability
 
