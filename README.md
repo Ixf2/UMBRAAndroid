@@ -148,6 +148,7 @@ La URL base de Retrofit en ese entorno es `http://127.0.0.1:8080/`. El comando r
 
 Las capturas Android se encuentran referenciadas mediante rutas relativas a `docs/images/` desde la raíz del repositorio. Las evidencias web y backend se incorporarán cuando estén disponibles.
 
+
 #### Aplicación web
 
 <!--
@@ -162,36 +163,36 @@ Las capturas Android se encuentran referenciadas mediante rutas relativas a `doc
 ##### Inicio de sesión y biblioteca / Login and library
 
 <p align="center">
-  <img src="docs/images/login.png" alt="Inicio de sesión / Login" width="240">
-  <img src="docs/images/biblioteca.png" alt="Biblioteca personal / Personal library" width="240">
+  <img src="docs/images/android/login.png" alt="Inicio de sesión / Login" width="240">
+  <img src="docs/images/android/biblioteca.png" alt="Biblioteca personal / Personal library" width="240">
 </p>
 
 ##### Creación y generación / Creation and generation
 
 <p align="center">
-  <img src="docs/images/creacion_personaje.png" alt="Formulario de creación / Creation form" width="240">
-  <img src="docs/images/generador.png" alt="Generador de personajes / Character generator" width="240">
+  <img src="docs/images/android/creacion_personaje.png" alt="Formulario de creación / Creation form" width="240">
+  <img src="docs/images/android/generador.png" alt="Generador de personajes / Character generator" width="240">
 </p>
 
 ##### Formulario cumplimentado / Completed form
 
 <p align="center">
-  <img src="docs/images/creacion_personaje_relleno.png" alt="Formulario completado 1 / Completed form 1" width="240">
-  <img src="docs/images/creacion_personaje_relleno1.png" alt="Formulario completado 2 / Completed form 2" width="240">
-  <img src="docs/images/creacion_personaje_relleno2.png" alt="Formulario completado 3 / Completed form 3" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno.png" alt="Formulario completado 1 / Completed form 1" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno1.png" alt="Formulario completado 2 / Completed form 2" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno2.png" alt="Formulario completado 3 / Completed form 3" width="240">
 </p>
 
 <p align="center">
-  <img src="docs/images/creacion_personaje_relleno3.png" alt="Formulario completado 4 / Completed form 4" width="240">
-  <img src="docs/images/creacion_personaje_relleno4.png" alt="Formulario completado 5 / Completed form 5" width="240">
-  <img src="docs/images/creacion_personaje_relleno5.png" alt="Formulario completado 6 / Completed form 6" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno3.png" alt="Formulario completado 4 / Completed form 4" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno4.png" alt="Formulario completado 5 / Completed form 5" width="240">
+  <img src="docs/images/android/creacion_personaje_relleno5.png" alt="Formulario completado 6 / Completed form 6" width="240">
 </p>
 
 ##### Edición y eliminación / Editing and deletion
 
 <p align="center">
-  <img src="docs/images/actualizar_personaje.png" alt="Actualizar personaje / Update character" width="240">
-  <img src="docs/images/eliminar_personaje.png" alt="Eliminar personaje / Delete character" width="240">
+  <img src="docs/images/android/actualizar_personaje.png" alt="Actualizar personaje / Update character" width="240">
+  <img src="docs/images/android/eliminar_personaje.png" alt="Eliminar personaje / Delete character" width="240">
 </p>
 
 #### Backend y base de datos
@@ -200,6 +201,7 @@ Las capturas Android se encuentran referenciadas mediante rutas relativas a `doc
 ![Pruebas API REST](docs/images/backend-api.webp)
 ![Modelo de datos](docs/images/base-datos.webp)
 -->
+
 
 ### 8. Calidad, seguridad y sostenibilidad
 
