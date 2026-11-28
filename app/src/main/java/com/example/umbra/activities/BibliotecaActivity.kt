@@ -1,3 +1,4 @@
+
 package com.example.umbra.activities
 
 import android.content.Intent
@@ -7,8 +8,10 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.umbra.R
@@ -17,8 +20,6 @@ import com.example.umbra.network.RetrofitClient
 import com.example.umbra.viewmodel.PersonajeViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
 
 class BibliotecaActivity : AppCompatActivity() {
 
@@ -40,6 +41,7 @@ class BibliotecaActivity : AppCompatActivity() {
 
   private val adapter = PersonajeAdapter(
     onPersonajeClick = { personaje ->
+
       val intent = Intent(
         this,
         DetallePersonajeActivity::class.java
@@ -61,9 +63,12 @@ class BibliotecaActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
     setContentView(R.layout.activity_biblioteca_activity)
 
-    viewModel = ViewModelProvider(this)[PersonajeViewModel::class.java]
+    viewModel = ViewModelProvider(this)[
+      PersonajeViewModel::class.java
+    ]
 
     btnCargar = findViewById(R.id.btnCargarPersonajes)
     txtEstado = findViewById(R.id.txtEstado)
@@ -81,15 +86,15 @@ class BibliotecaActivity : AppCompatActivity() {
     )
 
     titulo.text = if (mostrarMisPersonajes) {
-      "Mis personajes de UMBRA"
+      getString(R.string.biblioteca_mis_personajes)
     } else {
-      "Biblioteca pública de UMBRA"
+      getString(R.string.biblioteca_publica)
     }
 
     btnCargar.text = if (mostrarMisPersonajes) {
-      "Cargar mis personajes"
+      getString(R.string.biblioteca_cargar_mios)
     } else {
-      "Cargar personajes públicos"
+      getString(R.string.button_cargar_personajesPublicos)
     }
 
     btnIrLogin.visibility =
@@ -111,6 +116,7 @@ class BibliotecaActivity : AppCompatActivity() {
     }
 
     btnCrear.setOnClickListener {
+
       val intent = Intent(
         this,
         PersonajeActivity::class.java
@@ -124,6 +130,7 @@ class BibliotecaActivity : AppCompatActivity() {
     }
 
     btnIrLogin.setOnClickListener {
+
       val intent = Intent(
         this,
         MainActivity::class.java
@@ -138,47 +145,16 @@ class BibliotecaActivity : AppCompatActivity() {
     }
 
     btnCerrarSesion.setOnClickListener {
-      lifecycleScope.launch {
-        btnCerrarSesion.isEnabled = false
-        txtEstado.text = "Cerrando sesión..."
-
-        try {
-          val respuesta = api.logout()
-
-          if (respuesta.isSuccessful) {
-            val intent = Intent(
-              this@BibliotecaActivity,
-              MainActivity::class.java
-            )
-
-            intent.flags =
-              Intent.FLAG_ACTIVITY_NEW_TASK or
-                  Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-            startActivity(intent)
-            finish()
-          } else {
-            txtEstado.text =
-              "Error al cerrar sesión: ${respuesta.code()}"
-          }
-
-        } catch (e: CancellationException) {
-          throw e
-        } catch (e: Exception) {
-          txtEstado.text =
-            "Error de conexión: ${e.localizedMessage}"
-        } finally {
-          btnCerrarSesion.isEnabled = true
-        }
-      }
+      cerrarSesion(btnCerrarSesion)
     }
 
     cargarPersonajes()
   }
 
-
   private fun observarViewModel() {
+
     lifecycleScope.launch {
+
       repeatOnLifecycle(Lifecycle.State.STARTED) {
 
         launch {
@@ -202,8 +178,61 @@ class BibliotecaActivity : AppCompatActivity() {
     }
   }
 
-
   private fun cargarPersonajes() {
     viewModel.cargarPersonajes(mostrarMisPersonajes)
+  }
+
+  private fun cerrarSesion(btnCerrarSesion: Button) {
+
+    lifecycleScope.launch {
+
+      btnCerrarSesion.isEnabled = false
+
+      txtEstado.text = getString(
+        R.string.estado_cerrando_sesion
+      )
+
+      try {
+
+        val respuesta = api.logout()
+
+        if (respuesta.isSuccessful) {
+
+          val intent = Intent(
+            this@BibliotecaActivity,
+            MainActivity::class.java
+          )
+
+          intent.flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+          startActivity(intent)
+          finish()
+
+        } else {
+
+          txtEstado.text = getString(
+            R.string.estado_error_cerrar_sesion,
+            respuesta.code()
+          )
+        }
+
+      } catch (e: CancellationException) {
+
+        throw e
+
+      } catch (e: Exception) {
+
+        txtEstado.text = getString(
+          R.string.estado_error_conexion,
+          e.localizedMessage.orEmpty()
+        )
+
+      } finally {
+
+        btnCerrarSesion.isEnabled = true
+      }
+    }
   }
 }

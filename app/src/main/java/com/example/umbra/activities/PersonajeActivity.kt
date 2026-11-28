@@ -1,5 +1,6 @@
 package com.example.umbra.activities
 
+import androidx.compose.ui.res.pluralStringResource
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -426,16 +427,16 @@ fun CampoTexto(
                 Text(
                     when {
                         errorVacio -> stringResource(R.string.umbra_error_obligatorio)
-                        errorMaximo -> stringResource(R.string.umbra_error_maximo, maxCaracteres)
-                        obligatorio && limitado -> stringResource(R.string.umbra_rango_texto, maxCaracteres)
-                        limitado -> stringResource(R.string.umbra_maximo_texto, maxCaracteres)
+                        errorMaximo -> pluralStringResource(R.plurals.validacion_error_maximo, maxCaracteres, maxCaracteres)
+                        obligatorio && limitado -> stringResource(R.string.validacion_rango_longitud, maxCaracteres)
+                        limitado -> pluralStringResource(R.plurals.validacion_maximo_caracteres, maxCaracteres, maxCaracteres)
                         obligatorio -> stringResource(R.string.umbra_minimo_texto)
                         else -> stringResource(R.string.umbra_opcional)
                     }
                 )
                 Text(
-                    text = if (limitado) stringResource(R.string.umbra_contador_limite, valor.length, maxCaracteres)
-                    else stringResource(R.string.umbra_contador, valor.length),
+                    text = if (limitado) stringResource(R.string.validacion_contador_limite, valor.length, maxCaracteres)
+                    else pluralStringResource(R.plurals.validacion_contador_caracteres, valor.length, valor.length),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.End
                 )

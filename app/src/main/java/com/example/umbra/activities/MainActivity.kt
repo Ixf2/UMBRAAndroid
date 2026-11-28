@@ -1,3 +1,4 @@
+
 package com.example.umbra.activities
 
 import android.content.Intent
@@ -33,59 +34,122 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnLogin.setOnClickListener {
+
             val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString()
 
-            if (email.isBlank() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                etEmail.error = "Introduce un correo válido"
+            if (
+                email.isBlank() ||
+                !Patterns.EMAIL_ADDRESS.matcher(email).matches()
+            ) {
+                etEmail.error = getString(
+                    R.string.login_correo_invalido
+                )
+
                 etEmail.requestFocus()
                 return@setOnClickListener
             }
 
             if (password.isBlank()) {
-                etPassword.error = "Introduce tu contraseña"
+
+                etPassword.error = getString(
+                    R.string.login_password_obligatoria
+                )
+
                 etPassword.requestFocus()
                 return@setOnClickListener
             }
 
             lifecycleScope.launch {
+
                 btnLogin.isEnabled = false
-                txtEstado.text = "Iniciando sesión..."
+                btnBiblioteca.isEnabled = false
+
+                txtEstado.text = getString(
+                    R.string.login_procesando
+                )
 
                 try {
-                    val respuesta = api.login(LoginRequest(email, password))
+
+                    val respuesta = api.login(
+                        LoginRequest(email, password)
+                    )
 
                     if (respuesta.isSuccessful) {
+
                         val usuario = respuesta.body()
 
                         if (usuario != null) {
-                            txtEstado.text = "Bienvenido/a, ${usuario.nombreUsuario}"
+
+                            txtEstado.text = getString(
+                                R.string.login_bienvenida,
+                                usuario.nombreUsuario
+                            )
+
                             etPassword.text.clear()
+
                             abrirBiblioteca(true)
+
                         } else {
-                            txtEstado.text = "El servidor no devolvió los datos del usuario"
+
+                            txtEstado.text = getString(
+                                R.string.login_sin_datos
+                            )
                         }
+
                     } else {
+
                         txtEstado.text = when (respuesta.code()) {
-                            400, 401 -> "Correo o contraseña incorrectos"
-                            403 -> "Acceso denegado"
-                            else -> "Error HTTP: ${respuesta.code()}"
+
+                            400, 401 -> getString(
+                                R.string.login_credenciales_incorrectas
+                            )
+
+                            403 -> getString(
+                                R.string.login_acceso_denegado
+                            )
+
+                            else -> getString(
+                                R.string.estado_error_http,
+                                respuesta.code()
+                            )
                         }
                     }
+
                 } catch (e: CancellationException) {
+
                     throw e
+
                 } catch (e: Exception) {
-                    txtEstado.text = "Error de conexión: ${e.localizedMessage}"
+
+                    txtEstado.text = getString(
+                        R.string.estado_error_conexion,
+                        e.localizedMessage.orEmpty()
+                    )
+
                 } finally {
+
                     btnLogin.isEnabled = true
+                    btnBiblioteca.isEnabled = true
                 }
             }
         }
     }
 
-    private fun abrirBiblioteca(mostrarMisPersonajes: Boolean) {
-        val intent = Intent(this, BibliotecaActivity::class.java)
-        intent.putExtra("mostrarMisPersonajes", mostrarMisPersonajes)
+    private fun abrirBiblioteca(
+        mostrarMisPersonajes: Boolean
+    ) {
+
+        val intent = Intent(
+            this,
+            BibliotecaActivity::class.java
+        )
+
+        intent.putExtra(
+            "mostrarMisPersonajes",
+            mostrarMisPersonajes
+        )
+
         startActivity(intent)
     }
 }

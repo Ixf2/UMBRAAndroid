@@ -1,7 +1,23 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
     <style name="Base.Theme.UMBRA" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+
+        <item name="colorPrimary">@color/umbra_primary</item>
+        <item name="colorPrimaryDark">@color/umbra_primary_dark</item>
+        <item name="colorAccent">@color/umbra_primary</item>
+
+        <item name="android:windowBackground">@color/umbra_background</item>
+        <item name="android:statusBarColor">@color/umbra_background</item>
+        <item name="android:navigationBarColor">@color/umbra_background</item>
+
+        <item name="android:windowLightStatusBar">false</item>
+
+        <item name="android:textColorPrimary">@color/umbra_text</item>
+        <item name="android:textColorSecondary">@color/umbra_text_secondary</item>
+
     </style>
+
+    <style name="Theme.UMBRA" parent="Base.Theme.UMBRA" />
+
 </resources>

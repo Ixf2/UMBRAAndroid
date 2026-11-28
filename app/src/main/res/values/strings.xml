@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">UMBRA</string>
     <string name="textview_biblioteca">Tu biblioteca de personajes</string>
     <string name="button_abrir_Biblioteca">Abrir biblioteca</string>
@@ -9,7 +11,7 @@
 
     <string name="hint_correoElectronico">Correo electrónico</string>
     <string name="hint_contraseña">Contraseña</string>
-    <string name="button_inicioSesión">Inicio Sesión</string>
+    <string name="button_inicioSesión">Iniciar sesión</string>
     <string name="button_continuarInvitado">Continuar como invitado</string>
     <string name="button_volver_inicio">Volver al inicio</string>
     <string name="button_ir_login">Iniciar sesión</string>
@@ -17,10 +19,25 @@
     <string name="button_crear_personaje">Crear personaje</string>
     <string name="button_cargar_personajes">Cargar personajes</string>
 
+    <string name="biblioteca_mis_personajes">Mis personajes de UMBRA</string>
+    <string name="biblioteca_publica">Biblioteca pública de UMBRA</string>
+    <string name="biblioteca_cargar_mios">Cargar mis personajes</string>
+    <string name="biblioteca_sin_personajes">No hay personajes disponibles.</string>
+
+    <plurals name="biblioteca_personajes_encontrados">
+        <item quantity="one">%1$d personaje encontrado</item>
+        <item quantity="other">%1$d personajes encontrados</item>
+    </plurals>
+
+    <string name="estado_cargando_personajes">Cargando personajes…</string>
+    <string name="estado_cerrando_sesion">Cerrando sesión…</string>
+    <string name="estado_error_cerrar_sesion">Error al cerrar sesión: %1$d</string>
+    <string name="estado_error_conexion">Error de conexión: %1$s</string>
+    <string name="estado_error_http">Error HTTP: %1$d</string>
+
     <string name="personaje_clase_raza">%1$s · %2$s</string>
     <string name="personaje_nivel_visibilidad">Nivel %1$d · %2$s</string>
-    <string name="personaje_estadisticas">FUE %1$d   DES %2$d   INT %3$d   CAR %4$d</string>
-
+    <string name="personaje_estadisticas">FUE %1$d · DES %2$d · INT %3$d · CAR %4$d</string>
 
     <string name="detalle_historia">Historia</string>
     <string name="detalle_personalidad">Personalidad</string>
@@ -29,28 +46,40 @@
     <string name="detalle_eliminar_personaje">Eliminar personaje</string>
     <string name="detalle_volver_biblioteca">Volver a la biblioteca</string>
 
-
-
     <string name="detalle_personaje_invalido">Personaje no válido</string>
-    <string name="detalle_cargando_personaje">Cargando personaje...</string>
+    <string name="detalle_cargando_personaje">Cargando personaje…</string>
     <string name="detalle_no_encontrado">Personaje no encontrado</string>
     <string name="detalle_sesion_requerida">Debes iniciar sesión</string>
     <string name="detalle_sin_permisos">No tienes permiso para consultar este personaje</string>
     <string name="detalle_error_http">Error HTTP: %1$d</string>
     <string name="detalle_error_conexion">Error de conexión: %1$s</string>
-    <string name="detalle_valores_estadisticas">Fuerza: %1$d
-Destreza: %2$d
-Inteligencia: %3$d
-Carisma: %4$d</string>
+    <string name="detalle_valores_estadisticas">Fuerza: %1$d\nDestreza: %2$d\nInteligencia: %3$d\nCarisma: %4$d</string>
     <string name="sin_clase">Sin clase</string>
     <string name="sin_raza">Sin raza</string>
-
 
     <string name="eliminar_confirmacion_titulo">Eliminar personaje</string>
     <string name="eliminar_confirmacion_mensaje">¿Quieres eliminar a %1$s? Esta acción no se puede deshacer.</string>
     <string name="eliminar_cancelar">Cancelar</string>
     <string name="eliminar_confirmar">Eliminar definitivamente</string>
-    <string name="eliminar_procesando">Eliminando personaje...</string>
+    <string name="eliminar_procesando">Eliminando personaje…</string>
+
+
+    <string name="login_correo_invalido">Introduce un correo válido</string>
+    <string name="login_password_obligatoria">Introduce tu contraseña</string>
+    <string name="login_procesando">Iniciando sesión…</string>
+    <string name="login_bienvenida">Bienvenido/a, %1$s</string>
+    <string name="login_sin_datos">El servidor no devolvió los datos del usuario</string>
+    <string name="login_credenciales_incorrectas">Correo o contraseña incorrectos</string>
+    <string name="login_acceso_denegado">Acceso denegado</string>
+
+    <string name="eliminar_sin_permisos">No tienes permiso para eliminar este personaje</string>
+
+
+    <string name="formulario_guardando_personaje">Guardando personaje…</string>
+    <string name="formulario_actualizando_personaje">Actualizando personaje…</string>
+    <string name="formulario_guardado_correctamente">Personaje guardado correctamente</string>
+    <string name="formulario_datos_incorrectos">Revisa los datos del formulario</string>
+    <string name="formulario_sin_permisos">No tienes permiso para realizar esta operación</string>
 
 
 
