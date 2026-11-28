@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,144 +14,292 @@
             style="@style/UmbraTitulo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
+            android:layout_marginBottom="20dp"
             android:fontFamily="serif"
-            android:textSize="32sp"
-            android:letterSpacing="0.15"
             android:gravity="center"
-            android:layout_marginBottom="20dp" />
+            android:letterSpacing="0.15"
+            android:text="@string/app_name"
+            android:textSize="32sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/umbra_border"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="24dp"
+            android:background="@color/umbra_border" />
 
         <LinearLayout
+            android:id="@+id/contenidoDetalle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/umbra_card_background"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:visibility="gone">
 
-            <TextView
-                android:id="@+id/txtNombreDetalle"
-                style="@style/UmbraTitulo"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="serif"
-                android:textSize="30sp" />
+                android:background="@drawable/umbra_card_background"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                android:id="@+id/txtClaseRazaDetalle"
-                style="@style/UmbraTexto"
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/umbra_card_background"
+                    android:clipToOutline="true">
+
+                    <TextView
+                        android:id="@+id/txtInicialesDetalle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/umbra_surface_variant"
+                        android:fontFamily="serif"
+                        android:gravity="center"
+                        android:importantForAccessibility="no"
+                        android:textColor="@color/umbra_primary"
+                        android:textSize="52sp" />
+
+                    <ImageView
+                        android:id="@+id/imgPersonajeDetalle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@null"
+                        android:scaleType="fitCenter"
+                        android:visibility="invisible" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/txtNombreDetalle"
+                    style="@style/UmbraTitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="serif"
+                    android:gravity="center"
+                    android:textSize="30sp" />
+
+                <TextView
+                    android:id="@+id/txtClaseRazaDetalle"
+                    style="@style/UmbraTexto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/txtNivelDetalle"
+                    style="@style/UmbraTextoSecundario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="16dp"
+                android:background="@drawable/umbra_card_background"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <TextView
-                android:id="@+id/txtNivelDetalle"
-                style="@style/UmbraTextoSecundario"
+                <TextView
+                    style="@style/UmbraSubtitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="serif"
+                    android:text="@string/detalle_historia"
+                    android:textColor="@color/umbra_primary" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/umbra_border" />
+
+                <TextView
+                    android:id="@+id/txtHistoriaDetalle"
+                    style="@style/UmbraTexto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="5dp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="16dp"
+                android:background="@drawable/umbra_card_background"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-        </LinearLayout>
+                <TextView
+                    style="@style/UmbraSubtitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="serif"
+                    android:text="@string/detalle_personalidad"
+                    android:textColor="@color/umbra_primary" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/umbra_card_background"
-            android:orientation="vertical"
-            android:padding="20dp">
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/umbra_border" />
 
-            <TextView
-                style="@style/UmbraSubtitulo"
+                <TextView
+                    android:id="@+id/txtPersonalidadDetalle"
+                    style="@style/UmbraTexto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="5dp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/detalle_historia"
-                android:textColor="@color/umbra_primary"
-                android:fontFamily="serif" />
+                android:layout_marginTop="16dp"
+                android:background="@drawable/umbra_card_background"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/umbra_border"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp" />
+                <TextView
+                    style="@style/UmbraSubtitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="serif"
+                    android:text="@string/detalle_estadisticas"
+                    android:textColor="@color/umbra_primary" />
 
-            <TextView
-                android:id="@+id/txtHistoriaDetalle"
-                style="@style/UmbraTexto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lineSpacingExtra="5dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/umbra_border" />
 
-        </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/umbra_card_background"
-            android:orientation="vertical"
-            android:padding="20dp">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:background="@color/umbra_surface_variant"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-            <TextView
-                style="@style/UmbraSubtitulo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/detalle_personalidad"
-                android:textColor="@color/umbra_primary"
-                android:fontFamily="serif" />
+                        <TextView
+                            android:id="@+id/txtFuerzaDetalle"
+                            style="@style/UmbraTitulo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textSize="24sp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/umbra_border"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp" />
+                        <TextView
+                            style="@style/UmbraTextoSecundario"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:labelFor="@id/txtFuerzaDetalle"
+                            android:text="@string/detalle_fuerza" />
+                    </LinearLayout>
 
-            <TextView
-                android:id="@+id/txtPersonalidadDetalle"
-                style="@style/UmbraTexto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lineSpacingExtra="5dp" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/umbra_surface_variant"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-        </LinearLayout>
+                        <TextView
+                            android:id="@+id/txtDestrezaDetalle"
+                            style="@style/UmbraTitulo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textSize="24sp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/umbra_card_background"
-            android:orientation="vertical"
-            android:padding="20dp">
+                        <TextView
+                            style="@style/UmbraTextoSecundario"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:labelFor="@id/txtDestrezaDetalle"
+                            android:text="@string/detalle_destreza" />
+                    </LinearLayout>
+                </LinearLayout>
 
-            <TextView
-                style="@style/UmbraSubtitulo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/detalle_estadisticas"
-                android:textColor="@color/umbra_primary"
-                android:fontFamily="serif" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/umbra_border"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:background="@color/umbra_surface_variant"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
 
-            <TextView
-                android:id="@+id/txtEstadisticasDetalle"
-                style="@style/UmbraTexto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:lineSpacingExtra="8dp" />
+                        <TextView
+                            android:id="@+id/txtInteligenciaDetalle"
+                            style="@style/UmbraTitulo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textSize="24sp" />
 
+                        <TextView
+                            style="@style/UmbraTextoSecundario"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:labelFor="@id/txtInteligenciaDetalle"
+                            android:text="@string/detalle_inteligencia" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/umbra_surface_variant"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:id="@+id/txtCarismaDetalle"
+                            style="@style/UmbraTitulo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            style="@style/UmbraTextoSecundario"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:labelFor="@id/txtCarismaDetalle"
+                            android:text="@string/detalle_carisma" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
         <TextView
@@ -161,8 +308,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:accessibilityLiveRegion="polite" />
+            android:accessibilityLiveRegion="polite"
+            android:gravity="center" />
 
         <Button
             android:id="@+id/btnEditarPersonaje"
@@ -190,7 +337,5 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/detalle_volver_biblioteca" />
-
     </LinearLayout>
-
 </ScrollView>

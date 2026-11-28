@@ -1,6 +1,7 @@
 
 package com.example.umbra.repository
 
+import okhttp3.ResponseBody
 import okhttp3.MultipartBody
 import com.example.umbra.models.Personaje
 import com.example.umbra.models.PersonajeRequest
@@ -46,5 +47,10 @@ class PersonajeRepository(
         archivo: MultipartBody.Part
     ): Response<Unit> {
         return api.subirImagen(id, archivo)
+    }
+    suspend fun obtenerImagenDetalle(
+        id: Int
+    ): Response<ResponseBody> {
+        return api.obtenerImagenDetalle(id)
     }
 }

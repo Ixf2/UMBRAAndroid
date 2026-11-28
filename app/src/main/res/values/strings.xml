@@ -102,4 +102,11 @@
     <string name="imagen_reintentar">Reintentar guardado</string>
     <string name="imagen_volver_guardado">Volver al personaje guardado</string>
 
+
+    <string name="detalle_fuerza">Fuerza</string>
+    <string name="detalle_destreza">Destreza</string>
+    <string name="detalle_inteligencia">Inteligencia</string>
+    <string name="detalle_carisma">Carisma</string>
+    <string name="detalle_retrato_descripcion">Retrato de %1$s</string>
+
 </resources>
