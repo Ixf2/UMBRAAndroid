@@ -1,7 +1,5 @@
-
 package com.example.umbra.activities
 
-import com.example.umbra.ui.theme.UmbraTheme
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -22,6 +20,18 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import com.example.umbra.ui.theme.UmbraTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,11 +41,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
+import com.example.umbra.R
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.focus.onFocusChanged
 import com.example.umbra.models.Personaje
 import com.example.umbra.models.PersonajeRequest
 import com.example.umbra.viewmodel.FormularioPersonajeViewModel
@@ -77,14 +89,19 @@ class PersonajeActivity : ComponentActivity() {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color(0xFF101518))
+                                .safeDrawingPadding()
+                                .background(MaterialTheme.colorScheme.background)
                                 .padding(20.dp),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary
+                            )
                             Text(
+                                modifier = Modifier.padding(top = 16.dp),
                                 text = "Cargando personaje...",
-                                color = Color.White
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         }
                     }
@@ -93,7 +110,8 @@ class PersonajeActivity : ComponentActivity() {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color(0xFF101518))
+                                .safeDrawingPadding()
+                                .background(MaterialTheme.colorScheme.background)
                                 .padding(20.dp),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
@@ -102,7 +120,7 @@ class PersonajeActivity : ComponentActivity() {
                                 text = mensaje.ifBlank {
                                     "No se puede cargar el personaje"
                                 },
-                                color = Color.White
+                                color = MaterialTheme.colorScheme.onBackground
                             )
 
                             TextButton(
@@ -204,14 +222,21 @@ fun FormularioPersonaje(
         )
     }
 
-    var errorFormulario by rememberSaveable {
-        mutableStateOf("")
-    }
+    var intentoGuardar by rememberSaveable { mutableStateOf(false) }
+
+    val formularioValido = nombre.isNotBlank() && nombre.length <= 50 &&
+        historia.isNotBlank() && personalidad.isNotBlank() &&
+        clase.length <= 50 && raza.length <= 50 && origen.length <= 100 &&
+        listOf(nivel, fuerza, destreza, inteligencia, carisma).all {
+            it.toIntOrNull()?.let { numero -> numero in 1..20 } == true
+        }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF101518))
+            .background(MaterialTheme.colorScheme.background)
+            .safeDrawingPadding()
+            .imePadding()
             .verticalScroll(rememberScrollState())
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -219,8 +244,13 @@ fun FormularioPersonaje(
 
         Text(
             text = "UMBRA",
-            fontSize = 30.sp,
-            color = Color.White
+            fontSize = 32.sp,
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 4.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.primary
         )
 
         Text(
@@ -230,102 +260,60 @@ fun FormularioPersonaje(
                 "Editar personaje"
             },
             fontSize = 22.sp,
-            color = Color.White
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
         )
-
-        CampoTexto(
-            "Nombre",
-            nombre,
-            { nombre = it },
-            50
-        )
-
-        CampoTexto(
-            "Historia",
-            historia,
-            { historia = it }
-        )
-
-        CampoTexto(
-            "Personalidad",
-            personalidad,
-            { personalidad = it }
-        )
-
-        CampoTexto(
-            "Clase",
-            clase,
-            { clase = it },
-            50
-        )
-
-        CampoTexto(
-            "Raza",
-            raza,
-            { raza = it },
-            50
-        )
-
-        CampoTexto(
-            "Origen",
-            origen,
-            { origen = it },
-            100
-        )
-
-        CampoNumero("Nivel", nivel) {
-            nivel = it
-        }
 
         Text(
-            text = "Estadísticas",
-            fontSize = 20.sp,
-            color = Color.White
+            text = stringResource(R.string.umbra_campos_obligatorios),
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 14.sp
         )
 
-        CampoNumero("Fuerza", fuerza) {
-            fuerza = it
+        SeccionUmbra("Datos generales") {
+            CampoTexto("Nombre", nombre, { nombre = it }, 50, !guardando, obligatorio = true, mostrarError = intentoGuardar)
+            CampoTexto("Clase", clase, { clase = it }, 50, !guardando, mostrarError = intentoGuardar)
+            CampoTexto("Raza", raza, { raza = it }, 50, !guardando, mostrarError = intentoGuardar)
+            CampoTexto("Origen", origen, { origen = it }, 100, !guardando, mostrarError = intentoGuardar)
+            CampoNumero("Nivel", nivel, !guardando, intentoGuardar) { nivel = it }
         }
 
-        CampoNumero("Destreza", destreza) {
-            destreza = it
+        SeccionUmbra("Historia") {
+            CampoTexto("Historia", historia, { historia = it }, habilitado = !guardando, lineasMinimas = 3, obligatorio = true, mostrarError = intentoGuardar)
         }
 
-        CampoNumero("Inteligencia", inteligencia) {
-            inteligencia = it
+        SeccionUmbra("Personalidad") {
+            CampoTexto("Personalidad", personalidad, { personalidad = it }, habilitado = !guardando, lineasMinimas = 3, obligatorio = true, mostrarError = intentoGuardar)
         }
 
-        CampoNumero("Carisma", carisma) {
-            carisma = it
+        SeccionUmbra("Estadísticas") {
+            CampoNumero("Fuerza", fuerza, !guardando, intentoGuardar) { fuerza = it }
+            CampoNumero("Destreza", destreza, !guardando, intentoGuardar) { destreza = it }
+            CampoNumero("Inteligencia", inteligencia, !guardando, intentoGuardar) { inteligencia = it }
+            CampoNumero("Carisma", carisma, !guardando, intentoGuardar) { carisma = it }
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        SeccionUmbra("Visibilidad") {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = if (publico) "Público" else "Privado",
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Switch(
+                    checked = publico,
+                    onCheckedChange = { publico = it },
+                    enabled = !guardando
+                )
+            }
+        }
 
+        if (intentoGuardar && !formularioValido) {
             Text(
-                text = if (publico) {
-                    "Visibilidad: Público"
-                } else {
-                    "Visibilidad: Privado"
-                },
-                color = Color.White
-            )
-
-            Switch(
-                checked = publico,
-                onCheckedChange = {
-                    publico = it
-                },
-                enabled = !guardando
-            )
-        }
-
-        if (errorFormulario.isNotBlank()) {
-            Text(
-                text = errorFormulario,
+                text = stringResource(R.string.umbra_revisar_campos),
                 color = MaterialTheme.colorScheme.error
             )
         }
@@ -333,41 +321,16 @@ fun FormularioPersonaje(
         if (mensaje.isNotBlank()) {
             Text(
                 text = mensaje,
-                color = Color(0xFFC4CFD5)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
 
         Button(
             onClick = {
 
-                val estadisticas = listOf(
-                    nivel.toIntOrNull(),
-                    fuerza.toIntOrNull(),
-                    destreza.toIntOrNull(),
-                    inteligencia.toIntOrNull(),
-                    carisma.toIntOrNull()
-                )
+                intentoGuardar = true
 
-                errorFormulario = when {
-
-                    nombre.isBlank() ->
-                        "Introduce el nombre del personaje"
-
-                    historia.isBlank() ->
-                        "Introduce una historia"
-
-                    personalidad.isBlank() ->
-                        "Introduce la personalidad"
-
-                    estadisticas.any {
-                        it == null || it !in 1..20
-                    } ->
-                        "El nivel y las estadísticas deben estar entre 1 y 20"
-
-                    else -> ""
-                }
-
-                if (errorFormulario.isEmpty()) {
+                if (formularioValido) {
 
                     onGuardar(
                         PersonajeRequest(
@@ -401,7 +364,7 @@ fun FormularioPersonaje(
                 }
             },
             enabled = !guardando,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
         ) {
 
             Text(
@@ -433,20 +396,56 @@ fun CampoTexto(
     etiqueta: String,
     valor: String,
     onCambio: (String) -> Unit,
-    maxCaracteres: Int = Int.MAX_VALUE
+    maxCaracteres: Int = Int.MAX_VALUE,
+    habilitado: Boolean = true,
+    lineasMinimas: Int = 1,
+    obligatorio: Boolean = false,
+    mostrarError: Boolean = false
 ) {
+    var tuvoFoco by rememberSaveable { mutableStateOf(false) }
+    var enfocado by rememberSaveable { mutableStateOf(false) }
+    val limitado = maxCaracteres != Int.MAX_VALUE
+    val errorVacio = obligatorio && valor.isBlank() &&
+        (mostrarError || (tuvoFoco && !enfocado))
+    val errorMaximo = limitado && valor.length > maxCaracteres
 
     OutlinedTextField(
         value = valor,
-        onValueChange = {
-            if (it.length <= maxCaracteres) {
-                onCambio(it)
+        enabled = habilitado,
+        onValueChange = onCambio,
+        label = {
+            Text(stringResource(
+                if (obligatorio) R.string.umbra_etiqueta_obligatoria
+                else R.string.umbra_etiqueta_opcional,
+                etiqueta
+            ))
+        },
+        isError = errorVacio || errorMaximo,
+        supportingText = {
+            Column {
+                Text(
+                    when {
+                        errorVacio -> stringResource(R.string.umbra_error_obligatorio)
+                        errorMaximo -> stringResource(R.string.umbra_error_maximo, maxCaracteres)
+                        obligatorio && limitado -> stringResource(R.string.umbra_rango_texto, maxCaracteres)
+                        limitado -> stringResource(R.string.umbra_maximo_texto, maxCaracteres)
+                        obligatorio -> stringResource(R.string.umbra_minimo_texto)
+                        else -> stringResource(R.string.umbra_opcional)
+                    }
+                )
+                Text(
+                    text = if (limitado) stringResource(R.string.umbra_contador_limite, valor.length, maxCaracteres)
+                    else stringResource(R.string.umbra_contador, valor.length),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.End
+                )
             }
         },
-        label = {
-            Text(etiqueta)
-        },
-        modifier = Modifier.fillMaxWidth()
+        minLines = lineasMinimas,
+        modifier = Modifier.fillMaxWidth().onFocusChanged {
+            enfocado = it.isFocused
+            if (it.isFocused) tuvoFoco = true
+        }
     )
 }
 
@@ -454,22 +453,62 @@ fun CampoTexto(
 fun CampoNumero(
     etiqueta: String,
     valor: String,
+    habilitado: Boolean = true,
+    mostrarError: Boolean = false,
     onCambio: (String) -> Unit
 ) {
+    var tuvoFoco by rememberSaveable { mutableStateOf(false) }
+    var enfocado by rememberSaveable { mutableStateOf(false) }
+    val valido = valor.toIntOrNull()?.let { it in 1..20 } == true
+    val error = !valido && (mostrarError || valor.isNotEmpty() || (tuvoFoco && !enfocado))
 
     OutlinedTextField(
         value = valor,
+        enabled = habilitado,
         onValueChange = {
-            if (it.length <= 2 && it.all(Char::isDigit)) {
-                onCambio(it)
-            }
+            if (it.all { caracter -> caracter in '0'..'9' }) onCambio(it)
         },
-        label = {
-            Text(etiqueta)
+        label = { Text(stringResource(R.string.umbra_etiqueta_obligatoria, etiqueta)) },
+        isError = error,
+        supportingText = {
+            Text(stringResource(if (error && valor.isBlank()) R.string.umbra_error_obligatorio
+            else if (error) R.string.umbra_error_numero
+            else R.string.umbra_rango_numero))
         },
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number
-        ),
-        modifier = Modifier.fillMaxWidth()
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        modifier = Modifier.fillMaxWidth().onFocusChanged {
+            enfocado = it.isFocused
+            if (it.isFocused) tuvoFoco = true
+        }
     )
+}
+
+@Composable
+private fun SeccionUmbra(
+    titulo: String,
+    contenido: @Composable ColumnScope.() -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = titulo,
+                fontSize = 20.sp,
+                fontFamily = FontFamily.Serif,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            contenido()
+        }
+    }
 }

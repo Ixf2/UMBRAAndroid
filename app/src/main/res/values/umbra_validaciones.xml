@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="umbra_campos_obligatorios">Los campos marcados con * son obligatorios.</string>
+    <string name="umbra_etiqueta_obligatoria">%1$s *</string>
+    <string name="umbra_etiqueta_opcional">%1$s (opcional)</string>
+    <string name="umbra_error_obligatorio">Este campo es obligatorio.</string>
+    <string name="umbra_error_maximo">No puedes superar los %1$d caracteres.</string>
+    <string name="umbra_rango_texto">Entre 1 y %1$d caracteres. No solo espacios.</string>
+    <string name="umbra_maximo_texto">Máximo %1$d caracteres.</string>
+    <string name="umbra_minimo_texto">Mínimo 1 carácter distinto de un espacio.</string>
+    <string name="umbra_opcional">Campo opcional.</string>
+    <string name="umbra_contador_limite">%1$d/%2$d caracteres</string>
+    <string name="umbra_contador">%1$d caracteres</string>
+    <string name="umbra_rango_numero">Valor entre 1 y 20.</string>
+    <string name="umbra_error_numero">Introduce un número entero entre 1 y 20.</string>
+    <string name="umbra_revisar_campos">Revisa los campos marcados antes de guardar.</string>
+</resources>
