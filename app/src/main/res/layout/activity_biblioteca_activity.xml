@@ -31,6 +31,36 @@
         android:layout_marginBottom="8dp"
         android:text="@string/textview_BibliotecaUmbra" />
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnMisPersonajes"
+            style="@style/UmbraBotonPrincipal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:minHeight="48dp"
+            android:text="@string/biblioteca_mis_personajes" />
+
+        <Button
+            android:id="@+id/btnPersonajesPublicos"
+            style="@style/UmbraBotonSecundario"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:minHeight="48dp"
+            android:text="@string/biblioteca_pestana_publicos" />
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/txtEstado"
         style="@style/UmbraTextoSecundario"

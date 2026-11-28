@@ -8,6 +8,7 @@ import com.example.umbra.R
 import com.example.umbra.models.Personaje
 import com.example.umbra.repository.PersonajeRepository
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -18,6 +19,9 @@ class PersonajeViewModel(
 
   private val repository = PersonajeRepository()
   private val recursos = application.resources
+
+  private var trabajoCarga: Job? = null
+  private var versionCarga = 0
 
   private val _personajes =
     MutableStateFlow<List<Personaje>>(emptyList())
@@ -32,22 +36,35 @@ class PersonajeViewModel(
 
   fun cargarPersonajes(misPersonajes: Boolean) {
 
-    if (_cargando.value) return
+    val version = ++versionCarga
 
-    viewModelScope.launch {
+    trabajoCarga?.cancel()
 
-      _cargando.value = true
+    _cargando.value = true
+    _personajes.value = emptyList()
 
-      _mensaje.value = recursos.getString(
-        R.string.estado_cargando_personajes
-      )
+    _mensaje.value = recursos.getString(
+      R.string.estado_cargando_personajes
+    )
+
+    trabajoCarga = viewModelScope.launch {
 
       try {
 
         val respuesta = if (misPersonajes) {
+
           repository.obtenerMisPersonajes()
+
         } else {
+
           repository.obtenerPublicos()
+        }
+
+        if (version != versionCarga) {
+
+          respuesta.errorBody()?.close()
+
+          return@launch
         }
 
         if (respuesta.isSuccessful) {
@@ -73,6 +90,8 @@ class PersonajeViewModel(
 
         } else {
 
+          respuesta.errorBody()?.close()
+
           _personajes.value = emptyList()
 
           _mensaje.value = when (respuesta.code()) {
@@ -94,14 +113,22 @@ class PersonajeViewModel(
 
       } catch (e: Exception) {
 
-        _mensaje.value = recursos.getString(
-          R.string.estado_error_conexion,
-          e.localizedMessage.orEmpty()
-        )
+        if (version == versionCarga) {
+
+          _personajes.value = emptyList()
+
+          _mensaje.value = recursos.getString(
+            R.string.estado_error_conexion,
+            e.localizedMessage.orEmpty()
+          )
+        }
 
       } finally {
 
-        _cargando.value = false
+        if (version == versionCarga) {
+
+          _cargando.value = false
+        }
       }
     }
   }

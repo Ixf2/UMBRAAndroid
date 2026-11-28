@@ -142,5 +142,7 @@
     <string name="registro_email_duplicado">Ya existe una cuenta con ese correo electrónico.</string>
     <string name="registro_requisitos_password">Mínimo 8 caracteres. Máximo 72 bytes.</string>
 
+    <string name="biblioteca_pestana_publicos">Públicos</string>
+    <string name="biblioteca_titulo_general">Biblioteca</string>
 
 </resources>
