@@ -16,6 +16,7 @@ import retrofit2.http.Path
 import okhttp3.MultipartBody
 import retrofit2.http.Multipart
 import retrofit2.http.Part
+import com.example.umbra.models.RegistroRequest
 
 interface ApiService {
 
@@ -74,4 +75,8 @@ interface ApiService {
         @Part archivo: MultipartBody.Part
     ): Response<Unit>
 
+    @POST("api/auth/register")
+    suspend fun registrar(
+        @Body datos: RegistroRequest
+    ): Response<Usuario>
 }

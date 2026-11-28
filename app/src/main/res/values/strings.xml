@@ -122,4 +122,25 @@
     <string name="generador_confirmar">Generar</string>
     <string name="generador_cancelar">Cancelar</string>
 
+
+    <string name="registro_titulo">Crear cuenta</string>
+    <string name="registro_nombre">Nombre de usuario</string>
+    <string name="registro_email">Correo electrónico</string>
+    <string name="registro_password">Contraseña</string>
+    <string name="registro_confirmar_password">Confirmar contraseña</string>
+    <string name="registro_boton">Registrarse</string>
+    <string name="registro_volver">Volver al inicio de sesión</string>
+    <string name="registro_sin_cuenta">¿Todavía no tienes una cuenta?</string>
+
+    <string name="registro_nombre_invalido">El nombre debe contener entre 2 y 50 caracteres.</string>
+    <string name="registro_email_invalido">Introduce un correo electrónico válido de hasta 100 caracteres.</string>
+    <string name="registro_password_invalida">La contraseña debe contener entre 8 y 72 caracteres y no superar los 72 bytes.</string>
+    <string name="registro_password_no_coincide">Las contraseñas no coinciden.</string>
+    <string name="registro_procesando">Creando cuenta…</string>
+    <string name="registro_correcto">Cuenta creada correctamente. Ya puedes iniciar sesión.</string>
+    <string name="registro_datos_invalidos">Los datos introducidos no son válidos.</string>
+    <string name="registro_email_duplicado">Ya existe una cuenta con ese correo electrónico.</string>
+    <string name="registro_requisitos_password">Mínimo 8 caracteres. Máximo 72 bytes.</string>
+
+
 </resources>

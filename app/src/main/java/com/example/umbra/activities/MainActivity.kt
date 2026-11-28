@@ -128,6 +128,19 @@ class MainActivity : AppCompatActivity() {
         }
       }
     }
+
+    val btnAbrirRegistro = findViewById<Button>(
+      R.id.btnAbrirRegistro
+    )
+    btnAbrirRegistro.setOnClickListener {
+
+      val intent = Intent(
+        this,
+        RegistroActivity::class.java
+      )
+
+      startActivity(intent)
+    }
   }
 
   private fun abrirBiblioteca() {

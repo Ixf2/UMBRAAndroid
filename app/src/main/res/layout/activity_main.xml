@@ -102,6 +102,24 @@
             android:accessibilityLiveRegion="polite"
             android:layout_marginTop="12dp" />
 
+        <TextView
+            style="@style/UmbraTextoSecundario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="@string/registro_sin_cuenta" />
+
+        <Button
+            android:id="@+id/btnAbrirRegistro"
+            style="@style/UmbraBotonSecundario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/registro_boton" />
+
+
     </LinearLayout>
 
 </ScrollView>
