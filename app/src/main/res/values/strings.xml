@@ -114,4 +114,12 @@
 
     <string name="sesion_reintentar">Reintentar</string>
 
+    <string name="generador_titulo">Inspiración</string>
+    <string name="generador_descripcion">Genera un personaje aleatorio y personalízalo antes de guardarlo.</string>
+    <string name="generador_boton">Generar personaje</string>
+    <string name="generador_confirmacion_titulo">¿Generar otro personaje?</string>
+    <string name="generador_confirmacion_mensaje">Se sustituirán los datos actuales del formulario. La imagen seleccionada se conservará.</string>
+    <string name="generador_confirmar">Generar</string>
+    <string name="generador_cancelar">Cancelar</string>
+
 </resources>

@@ -74,6 +74,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import com.example.umbra.utils.SessionManager
+import com.example.umbra.utils.GeneradorPersonajes
+import androidx.compose.material3.AlertDialog
 import kotlinx.coroutines.launch
 import com.example.umbra.R
 import androidx.compose.ui.res.stringResource
@@ -178,22 +180,22 @@ class PersonajeActivity : ComponentActivity() {
           if (formularioInicializado) {
             Box(
               modifier = Modifier
-                  .fillMaxSize()
-                  .then(
-                      if (sesionValida) Modifier
-                      else Modifier
-                          .alpha(0f)
-                          .clearAndSetSemantics { }
-                  )
+                .fillMaxSize()
+                .then(
+                  if (sesionValida) Modifier
+                  else Modifier
+                    .alpha(0f)
+                    .clearAndSetSemantics { }
+                )
             ) {
               when {
                 cargando -> {
                   Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .safeDrawingPadding()
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(20.dp),
+                      .fillMaxSize()
+                      .safeDrawingPadding()
+                      .background(MaterialTheme.colorScheme.background)
+                      .padding(20.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                   ) {
@@ -211,10 +213,10 @@ class PersonajeActivity : ComponentActivity() {
                 esEdicion && personaje == null -> {
                   Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .safeDrawingPadding()
-                        .background(MaterialTheme.colorScheme.background)
-                        .padding(20.dp),
+                      .fillMaxSize()
+                      .safeDrawingPadding()
+                      .background(MaterialTheme.colorScheme.background)
+                      .padding(20.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                   ) {
@@ -266,10 +268,10 @@ class PersonajeActivity : ComponentActivity() {
           if (!sesionValida) {
             Column(
               modifier = Modifier
-                  .fillMaxSize()
-                  .background(MaterialTheme.colorScheme.background)
-                  .safeDrawingPadding()
-                  .padding(20.dp),
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .safeDrawingPadding()
+                .padding(20.dp),
               verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
               horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -388,6 +390,46 @@ fun FormularioPersonaje(
   var errorImagen by remember { mutableStateOf("") }
   var leyendoImagen by remember { mutableStateOf(false) }
   val camposHabilitados = sesionHabilitada && !guardando && !datosGuardados
+  var rasgosGenerados by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
+  var confirmarGeneracion by rememberSaveable { mutableStateOf(false) }
+
+  fun generarPersonaje() {
+    val generado = GeneradorPersonajes.generar()
+    nombre = generado.nombre
+    historia = generado.historia
+    personalidad = generado.personalidad
+    clase = generado.clase.orEmpty()
+    raza = generado.raza.orEmpty()
+    origen = generado.origen.orEmpty()
+    nivel = generado.nivel.toString()
+    fuerza = generado.fuerza.toString()
+    destreza = generado.destreza.toString()
+    inteligencia = generado.inteligencia.toString()
+    carisma = generado.carisma.toString()
+    publico = generado.visibilidad == "publico"
+    rasgosGenerados = ArrayList(generado.rasgos.orEmpty())
+    intentoGuardar = false
+  }
+
+  if (confirmarGeneracion && camposHabilitados && personajeInicial == null) {
+    AlertDialog(
+      onDismissRequest = { confirmarGeneracion = false },
+      title = { Text(stringResource(R.string.generador_confirmacion_titulo)) },
+      text = { Text(stringResource(R.string.generador_confirmacion_mensaje)) },
+      confirmButton = {
+        TextButton(onClick = {
+          confirmarGeneracion = false
+          if (camposHabilitados) generarPersonaje()
+        }) { Text(stringResource(R.string.generador_confirmar)) }
+      },
+      dismissButton = {
+        TextButton(onClick = { confirmarGeneracion = false }) {
+          Text(stringResource(R.string.generador_cancelar))
+        }
+      }
+    )
+  }
+
   val selectorImagen = rememberLauncherForActivityResult(
     ActivityResultContracts.OpenDocument()
   ) { uri ->
@@ -452,12 +494,12 @@ fun FormularioPersonaje(
 
   Column(
     modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
-        .safeDrawingPadding()
-        .imePadding()
-        .verticalScroll(rememberScrollState())
-        .padding(20.dp),
+      .fillMaxSize()
+      .background(MaterialTheme.colorScheme.background)
+      .safeDrawingPadding()
+      .imePadding()
+      .verticalScroll(rememberScrollState())
+      .padding(20.dp),
     verticalArrangement = Arrangement.spacedBy(12.dp)
   ) {
 
@@ -489,6 +531,25 @@ fun FormularioPersonaje(
       fontSize = 14.sp
     )
 
+    if (personajeInicial == null) {
+      SeccionUmbra(stringResource(R.string.generador_titulo)) {
+        Text(stringResource(R.string.generador_descripcion))
+        Button(
+          onClick = {
+            val hayDatos = listOf(nombre, historia, personalidad, clase, raza, origen)
+              .any { it.isNotBlank() } || nivel != "1" ||
+                listOf(fuerza, destreza, inteligencia, carisma).any { it != "10" } ||
+                publico || rasgosGenerados.isNotEmpty()
+            if (hayDatos) confirmarGeneracion = true else generarPersonaje()
+          },
+          enabled = camposHabilitados && !leyendoImagen,
+          modifier = Modifier.fillMaxWidth()
+        ) {
+          Text(stringResource(R.string.generador_boton))
+        }
+      }
+    }
+
     SeccionUmbra(stringResource(R.string.imagen_retrato)) {
       val vistaPrevia = imagenPreparada?.bitmap ?: imagenActual
       val retrato = when (personajeInicial?.retrato) {
@@ -501,9 +562,9 @@ fun FormularioPersonaje(
         contentAlignment = Alignment.Center
       ) {
         val marco = Modifier
-            .size(144.dp, 192.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+          .size(144.dp, 192.dp)
+          .clip(RoundedCornerShape(12.dp))
+          .background(MaterialTheme.colorScheme.surfaceVariant)
         when {
           vistaPrevia != null -> Image(
             bitmap = vistaPrevia.asImageBitmap(),
@@ -686,7 +747,7 @@ fun FormularioPersonaje(
               nivel = nivel.toInt(),
               origen = origen.trim().ifBlank { null },
               rasgos =
-                personajeInicial?.rasgos.orEmpty(),
+                personajeInicial?.rasgos ?: rasgosGenerados.toList(),
               retrato =
                 personajeInicial?.retrato ?: 2,
               favorito =
@@ -698,8 +759,8 @@ fun FormularioPersonaje(
       },
       enabled = sesionHabilitada && !guardando && !leyendoImagen && seleccionLista && errorImagen.isBlank(),
       modifier = Modifier
-          .fillMaxWidth()
-          .heightIn(min = 56.dp)
+        .fillMaxWidth()
+        .heightIn(min = 56.dp)
     ) {
 
       Text(
@@ -808,11 +869,11 @@ fun CampoTexto(
     },
     minLines = lineasMinimas,
     modifier = Modifier
-        .fillMaxWidth()
-        .onFocusChanged {
-            enfocado = it.isFocused
-            if (it.isFocused) tuvoFoco = true
-        }
+      .fillMaxWidth()
+      .onFocusChanged {
+        enfocado = it.isFocused
+        if (it.isFocused) tuvoFoco = true
+      }
   )
 }
 
@@ -849,11 +910,11 @@ fun CampoNumero(
     singleLine = true,
     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     modifier = Modifier
-        .fillMaxWidth()
-        .onFocusChanged {
-            enfocado = it.isFocused
-            if (it.isFocused) tuvoFoco = true
-        }
+      .fillMaxWidth()
+      .onFocusChanged {
+        enfocado = it.isFocused
+        if (it.isFocused) tuvoFoco = true
+      }
   )
 }
 
