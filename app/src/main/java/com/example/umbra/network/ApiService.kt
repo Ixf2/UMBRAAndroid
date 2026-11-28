@@ -1,9 +1,11 @@
+
 package com.example.umbra.network
 
 import com.example.umbra.models.LoginRequest
 import com.example.umbra.models.Personaje
 import com.example.umbra.models.PersonajeRequest
 import com.example.umbra.models.Usuario
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -51,4 +53,14 @@ interface ApiService {
     suspend fun eliminarPersonaje(
         @Path("id") id: Int
     ): Response<Unit>
+
+    @GET("api/personajes/{id}/imagen/miniatura")
+    suspend fun obtenerMiniatura(
+        @Path("id") id: Int
+    ): Response<ResponseBody>
+
+    @GET("api/personajes/{id}/imagen/detalle")
+    suspend fun obtenerImagenDetalle(
+        @Path("id") id: Int
+    ): Response<ResponseBody>
 }
