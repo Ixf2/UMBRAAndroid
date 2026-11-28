@@ -101,9 +101,9 @@ La evolución del proyecto incluye opciones de configuración, notificaciones y 
 
 | Componente | Tecnología | Repositorio |
 | --- | --- | --- |
-| Aplicación web | React, Vite | [UMBRA Web](https://github.com/Ixf2/UMBRAJoanaRamirez/tree/develop) |
-| Aplicación móvil | Kotlin, Android Studio | [UMBRA Android](https://github.com/Ixf2/UMBRAAndroid/tree/develop) |
-| Backend | Java, Spring Boot, Maven | [UMBRA Backend](https://github.com/Ixf2/UmbraBackendJoanaRam-rez/tree/develop) |
+| Aplicación web | React, Vite | [UMBRA Web](https://github.com/Ixf2/UMBRAJoanaRamirez) |
+| Aplicación móvil | Kotlin, Android Studio | [UMBRA Android](https://github.com/Ixf2/UMBRAAndroid) |
+| Backend | Java, Spring Boot, Maven | [UMBRA Backend](https://github.com/Ixf2/UmbraBackendJoanaRam-rez) |
 | Base de datos | MariaDB, SQL | [Script SQL `umbra`](https://drive.google.com/file/d/1jVAfkBek3cXsasbAn0mDg8_ejbLLUk1e/view?usp=sharing) |
 
 ### 4. Arquitectura
