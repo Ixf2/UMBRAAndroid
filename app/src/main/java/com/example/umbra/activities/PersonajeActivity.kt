@@ -2,6 +2,29 @@ package com.example.umbra.activities
 
 import androidx.compose.ui.res.pluralStringResource
 import android.app.Activity
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import com.example.umbra.network.RetrofitClient
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -77,6 +100,15 @@ class PersonajeActivity : ComponentActivity() {
                 val guardando by viewModel.guardando.collectAsState()
                 val mensaje by viewModel.mensaje.collectAsState()
                 val guardado by viewModel.guardado.collectAsState()
+                val datosGuardados by viewModel.datosGuardados.collectAsState()
+                val subiendoImagen by viewModel.subiendoImagen.collectAsState()
+
+                BackHandler(enabled = guardando || datosGuardados) {
+                    if (!guardando) {
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    }
+                }
 
                 LaunchedEffect(guardado) {
                     if (guardado) {
@@ -101,7 +133,7 @@ class PersonajeActivity : ComponentActivity() {
                             )
                             Text(
                                 modifier = Modifier.padding(top = 16.dp),
-                                text = "Cargando personaje...",
+                                text = stringResource(R.string.detalle_cargando_personaje),
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                         }
@@ -136,14 +168,18 @@ class PersonajeActivity : ComponentActivity() {
                         FormularioPersonaje(
                             personajeInicial = personaje,
                             guardando = guardando,
+                            datosGuardados = datosGuardados,
+                            subiendoImagen = subiendoImagen,
                             mensaje = mensaje,
                             onVolver = {
+                                if (datosGuardados) setResult(Activity.RESULT_OK)
                                 finish()
                             },
-                            onGuardar = { datos ->
+                            onGuardar = { datos, archivo ->
                                 viewModel.guardarPersonaje(
                                     idPersonaje,
-                                    datos
+                                    datos,
+                                    archivo
                                 )
                             }
                         )
@@ -158,9 +194,11 @@ class PersonajeActivity : ComponentActivity() {
 fun FormularioPersonaje(
     personajeInicial: Personaje? = null,
     guardando: Boolean,
+    datosGuardados: Boolean,
+    subiendoImagen: Boolean,
     mensaje: String,
     onVolver: () -> Unit,
-    onGuardar: (PersonajeRequest) -> Unit
+    onGuardar: (PersonajeRequest, MultipartBody.Part?) -> Unit
 ) {
 
     var nombre by rememberSaveable {
@@ -225,6 +263,72 @@ fun FormularioPersonaje(
 
     var intentoGuardar by rememberSaveable { mutableStateOf(false) }
 
+    val contexto = LocalContext.current
+    val mensajeErrorLectura = stringResource(
+        R.string.imagen_error_lectura
+    )
+    var uriImagen by rememberSaveable { mutableStateOf<String?>(null) }
+    var revisionImagen by remember { mutableStateOf(0) }
+    var imagenPreparada by remember { mutableStateOf<ImagenPreparada?>(null) }
+    var imagenActual by remember { mutableStateOf<Bitmap?>(null) }
+    var errorImagen by remember { mutableStateOf("") }
+    var leyendoImagen by remember { mutableStateOf(false) }
+    val camposHabilitados = !guardando && !datosGuardados
+    val selectorImagen = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            imagenPreparada = null
+            errorImagen = ""
+            uriImagen = uri.toString()
+            revisionImagen++
+        }
+    }
+
+    LaunchedEffect(uriImagen, revisionImagen) {
+        imagenPreparada = null
+        errorImagen = ""
+        val seleccion = uriImagen
+        leyendoImagen = seleccion != null
+        if (seleccion != null) {
+            try {
+                imagenPreparada = withContext(Dispatchers.IO) {
+                    prepararImagen(contexto, Uri.parse(seleccion))
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IllegalArgumentException) {
+                errorImagen = e.message ?: mensajeErrorLectura
+            } catch (e: Exception) {
+                errorImagen = mensajeErrorLectura
+            } finally {
+                leyendoImagen = false
+            }
+        }
+    }
+
+    LaunchedEffect(personajeInicial?.idPersonaje) {
+        val id = personajeInicial?.idPersonaje ?: return@LaunchedEffect
+        try {
+            imagenActual = withContext(Dispatchers.IO) {
+                val respuesta = RetrofitClient.apiService.obtenerImagenDetalle(id)
+                if (respuesta.isSuccessful) {
+                    respuesta.body()?.use { BitmapFactory.decodeStream(it.byteStream()) }
+                } else {
+                    respuesta.errorBody()?.close()
+                    null
+                }
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            imagenActual = null
+        }
+    }
+
+    val seleccionLista = uriImagen == null || imagenPreparada?.uri == uriImagen
+
+
     val formularioValido = nombre.isNotBlank() && nombre.length <= 50 &&
         historia.isNotBlank() && personalidad.isNotBlank() &&
         clase.length <= 50 && raza.length <= 50 && origen.length <= 100 &&
@@ -271,27 +375,93 @@ fun FormularioPersonaje(
             fontSize = 14.sp
         )
 
+        SeccionUmbra(stringResource(R.string.imagen_retrato)) {
+            val vistaPrevia = imagenPreparada?.bitmap ?: imagenActual
+            val retrato = when (personajeInicial?.retrato) {
+                0 -> R.drawable.elara_valen
+                1 -> R.drawable.kael_grim
+                else -> null
+            }
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                val marco = Modifier.size(144.dp, 192.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                when {
+                    vistaPrevia != null -> Image(
+                        bitmap = vistaPrevia.asImageBitmap(),
+                        contentDescription = stringResource(R.string.imagen_vista_previa),
+                        modifier = marco,
+                        contentScale = ContentScale.Crop
+                    )
+                    retrato != null -> Image(
+                        painter = painterResource(retrato),
+                        contentDescription = stringResource(R.string.imagen_vista_previa),
+                        modifier = marco,
+                        contentScale = ContentScale.Crop
+                    )
+                    else -> Box(marco, contentAlignment = Alignment.Center) {
+                        Text(
+                            nombre.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
+                                .take(2).joinToString("") { it.take(1).uppercase() },
+                            fontSize = 32.sp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+            Button(
+                onClick = { selectorImagen.launch(arrayOf("image/png", "image/jpeg", "image/webp")) },
+                enabled = !guardando && !leyendoImagen,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(if (uriImagen != null || imagenActual != null || retrato != null)
+                    R.string.imagen_cambiar else R.string.imagen_seleccionar))
+            }
+            if (uriImagen != null) {
+                TextButton(
+                    onClick = {
+                        uriImagen = null
+                        imagenPreparada = null
+                        errorImagen = ""
+                    },
+                    enabled = !guardando && !leyendoImagen
+                ) {
+                    Text(stringResource(R.string.imagen_descartar_seleccion))
+                }
+            }
+            Text(stringResource(R.string.imagen_requisitos), fontSize = 13.sp)
+            if (leyendoImagen || subiendoImagen) {
+                CircularProgressIndicator(modifier = Modifier.size(28.dp))
+            }
+            if (errorImagen.isNotBlank()) {
+                Text(errorImagen, color = MaterialTheme.colorScheme.error)
+            }
+        }
+
         SeccionUmbra("Datos generales") {
-            CampoTexto("Nombre", nombre, { nombre = it }, 50, !guardando, obligatorio = true, mostrarError = intentoGuardar)
-            CampoTexto("Clase", clase, { clase = it }, 50, !guardando, mostrarError = intentoGuardar)
-            CampoTexto("Raza", raza, { raza = it }, 50, !guardando, mostrarError = intentoGuardar)
-            CampoTexto("Origen", origen, { origen = it }, 100, !guardando, mostrarError = intentoGuardar)
-            CampoNumero("Nivel", nivel, !guardando, intentoGuardar) { nivel = it }
+            CampoTexto("Nombre", nombre, { nombre = it }, 50, camposHabilitados, obligatorio = true, mostrarError = intentoGuardar)
+            CampoTexto("Clase", clase, { clase = it }, 50, camposHabilitados, mostrarError = intentoGuardar)
+            CampoTexto("Raza", raza, { raza = it }, 50, camposHabilitados, mostrarError = intentoGuardar)
+            CampoTexto("Origen", origen, { origen = it }, 100, camposHabilitados, mostrarError = intentoGuardar)
+            CampoNumero("Nivel", nivel, camposHabilitados, intentoGuardar) { nivel = it }
         }
 
         SeccionUmbra("Historia") {
-            CampoTexto("Historia", historia, { historia = it }, habilitado = !guardando, lineasMinimas = 3, obligatorio = true, mostrarError = intentoGuardar)
+            CampoTexto("Historia", historia, { historia = it }, habilitado = camposHabilitados, lineasMinimas = 3, obligatorio = true, mostrarError = intentoGuardar)
         }
 
         SeccionUmbra("Personalidad") {
-            CampoTexto("Personalidad", personalidad, { personalidad = it }, habilitado = !guardando, lineasMinimas = 3, obligatorio = true, mostrarError = intentoGuardar)
+            CampoTexto("Personalidad", personalidad, { personalidad = it }, habilitado = camposHabilitados, lineasMinimas = 3, obligatorio = true, mostrarError = intentoGuardar)
         }
 
         SeccionUmbra("Estadísticas") {
-            CampoNumero("Fuerza", fuerza, !guardando, intentoGuardar) { fuerza = it }
-            CampoNumero("Destreza", destreza, !guardando, intentoGuardar) { destreza = it }
-            CampoNumero("Inteligencia", inteligencia, !guardando, intentoGuardar) { inteligencia = it }
-            CampoNumero("Carisma", carisma, !guardando, intentoGuardar) { carisma = it }
+            CampoNumero("Fuerza", fuerza, camposHabilitados, intentoGuardar) { fuerza = it }
+            CampoNumero("Destreza", destreza, camposHabilitados, intentoGuardar) { destreza = it }
+            CampoNumero("Inteligencia", inteligencia, camposHabilitados, intentoGuardar) { inteligencia = it }
+            CampoNumero("Carisma", carisma, camposHabilitados, intentoGuardar) { carisma = it }
         }
 
         SeccionUmbra("Visibilidad") {
@@ -307,7 +477,7 @@ fun FormularioPersonaje(
                 Switch(
                     checked = publico,
                     onCheckedChange = { publico = it },
-                    enabled = !guardando
+                    enabled = camposHabilitados
                 )
             }
         }
@@ -360,18 +530,25 @@ fun FormularioPersonaje(
                                 personajeInicial?.retrato ?: 2,
                             favorito =
                                 personajeInicial?.favorito ?: false
-                        )
+                        ),
+                        imagenPreparada?.archivo
                     )
                 }
             },
-            enabled = !guardando,
+            enabled = !guardando && !leyendoImagen && seleccionLista && errorImagen.isBlank(),
             modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp)
         ) {
 
             Text(
                 when {
+                    subiendoImagen ->
+                        stringResource(R.string.imagen_subiendo)
+
                     guardando ->
-                        "Guardando..."
+                        stringResource(R.string.formulario_guardando_personaje)
+
+                    datosGuardados ->
+                        stringResource(R.string.imagen_reintentar)
 
                     personajeInicial != null ->
                         "Actualizar personaje"
@@ -387,7 +564,7 @@ fun FormularioPersonaje(
             enabled = !guardando,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Cancelar y volver")
+            Text(if (datosGuardados) stringResource(R.string.imagen_volver_guardado) else "Cancelar y volver")
         }
     }
 }
@@ -512,4 +689,52 @@ private fun SeccionUmbra(
             contenido()
         }
     }
+}
+
+
+private data class ImagenPreparada(
+    val uri: String,
+    val bitmap: Bitmap,
+    val archivo: MultipartBody.Part
+)
+
+private fun prepararImagen(contexto: Context, uri: Uri): ImagenPreparada {
+    val limite = 5 * 1024 * 1024
+    val bytes = contexto.contentResolver.openInputStream(uri)?.use { entrada ->
+        val salida = java.io.ByteArrayOutputStream()
+        val buffer = ByteArray(8192)
+        var total = 0
+        while (true) {
+            val leidos = entrada.read(buffer)
+            if (leidos == -1) break
+            total += leidos
+            require(total <= limite) { contexto.getString(R.string.imagen_error_tamano) }
+            salida.write(buffer, 0, leidos)
+        }
+        salida.toByteArray()
+    } ?: throw IllegalArgumentException(contexto.getString(R.string.imagen_error_lectura))
+
+    val opciones = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opciones)
+    val tipo = opciones.outMimeType
+    val extension = when (tipo) {
+        "image/png" -> "png"
+        "image/jpeg" -> "jpg"
+        "image/webp" -> "webp"
+        else -> throw IllegalArgumentException(contexto.getString(R.string.imagen_error_formato))
+    }
+    val ancho = opciones.outWidth
+    val alto = opciones.outHeight
+    require(ancho > 0 && alto > 0 && ancho <= 5000 && alto <= 5000 &&
+        ancho.toLong() * alto <= 12_000_000L) {
+        contexto.getString(R.string.imagen_error_resolucion)
+    }
+    var muestra = 1
+    while (maxOf(ancho, alto) / muestra > 768) muestra *= 2
+    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size,
+        BitmapFactory.Options().apply { inSampleSize = muestra })
+        ?: throw IllegalArgumentException(contexto.getString(R.string.imagen_error_procesamiento))
+    val cuerpo = bytes.toRequestBody(requireNotNull(tipo).toMediaType())
+    val archivo = MultipartBody.Part.createFormData("archivo", "retrato.$extension", cuerpo)
+    return ImagenPreparada(uri.toString(), bitmap, archivo)
 }

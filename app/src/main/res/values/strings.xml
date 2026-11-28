@@ -82,5 +82,24 @@
     <string name="formulario_sin_permisos">No tienes permiso para realizar esta operación</string>
 
 
+    <string name="imagen_subiendo">Subiendo imagen…</string>
+    <string name="imagen_error_formato">Selecciona una imagen PNG, JPG o WebP.</string>
+    <string name="imagen_error_tamano">La imagen supera el límite de 5 MB.</string>
+    <string name="imagen_error_procesamiento">No se ha podido procesar la imagen.</string>
+    <string name="imagen_error_optimizacion">No se ha podido optimizar la imagen.</string>
+    <string name="imagen_error_subida">El personaje se ha guardado, pero no se ha podido subir la imagen. Puedes volver a intentarlo.</string>
+    <string name="imagen_seleccionar">Seleccionar imagen</string>
+    <string name="imagen_cambiar">Cambiar imagen</string>
+    <string name="imagen_retrato">Retrato del personaje</string>
+    <string name="imagen_requisitos">PNG, JPG o WebP. Máximo 5 MB.</string>
+    <string name="imagen_error_lectura">No se ha podido leer el archivo seleccionado.</string>
+    <string name="imagen_vista_previa">Vista previa del retrato</string>
+    <string name="formulario_error_id">El servidor no ha devuelto el identificador del personaje. Comprueba la biblioteca antes de volver a crearlo.</string>
+
+
+    <string name="imagen_descartar_seleccion">Descartar imagen seleccionada</string>
+    <string name="imagen_error_resolucion">La resolución de la imagen es demasiado grande.</string>
+    <string name="imagen_reintentar">Reintentar guardado</string>
+    <string name="imagen_volver_guardado">Volver al personaje guardado</string>
 
 </resources>

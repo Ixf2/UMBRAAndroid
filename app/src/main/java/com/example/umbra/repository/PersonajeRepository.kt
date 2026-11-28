@@ -1,6 +1,7 @@
 
 package com.example.umbra.repository
 
+import okhttp3.MultipartBody
 import com.example.umbra.models.Personaje
 import com.example.umbra.models.PersonajeRequest
 import com.example.umbra.network.ApiService
@@ -38,5 +39,12 @@ class PersonajeRepository(
 
     suspend fun eliminarPersonaje(id: Int): Response<Unit> {
         return api.eliminarPersonaje(id)
+    }
+
+    suspend fun subirImagen(
+        id: Int,
+        archivo: MultipartBody.Part
+    ): Response<Unit> {
+        return api.subirImagen(id, archivo)
     }
 }
