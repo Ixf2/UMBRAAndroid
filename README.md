@@ -32,7 +32,10 @@ El proyecto se desarrolla como parte del Proyecto Interdisciplinar de 2.º del C
 
 ### 2. Funcionalidades
 
-- Inicio y cierre de sesión obligatorios para acceder a la biblioteca y a los personajes públicos o privados.
+- Registro de usuarios desde Android, con validación de nombre, correo, contraseña y confirmación de contraseña.
+- Inicio y cierre de sesión mediante Spring Security; autenticación obligatoria para consultar personajes públicos o privados.
+- Biblioteca personal y biblioteca pública mediante pestañas: gestión de personajes propios y consulta de personajes públicos de otros usuarios registrados.
+- La pestaña pública es de solo lectura; la edición y eliminación se realizan desde la biblioteca personal y están sujetas a la autorización del servidor.
 - Verificación de sesión en Android mediante `SessionManager` y protección de las Activities internas.
 - Generador aleatorio de personajes en Android: nombre, clase, raza, origen, historia, personalidad, nivel, rasgos y estadísticas editables antes de guardar.
 - Selección de retratos PNG, JPEG o WebP desde el dispositivo (máximo 5 MiB), vista previa y actualización del retrato.
@@ -41,7 +44,7 @@ El proyecto se desarrolla como parte del Proyecto Interdisciplinar de 2.º del C
 - Gestión de nombre, historia, personalidad, clase, raza, origen, nivel y estadísticas.
 - Visibilidad pública o privada y control de permisos sobre los personajes.
 - Interfaz web adaptable a diferentes tamaños de pantalla, con soporte de español e inglés.
-- Aplicación Android con pantallas XML Views y un formulario desarrollado con Jetpack Compose.
+- Aplicación Android con cinco Activities: cuatro con XML Views y una con Jetpack Compose.
 - Validación de formularios, gestión de estados de carga y mensajes de error.
 
 La evolución del proyecto incluye opciones de configuración, notificaciones y funcionalidades de compartición. Su disponibilidad depende del estado de implementación de cada cliente.
@@ -53,7 +56,7 @@ La evolución del proyecto incluye opciones de configuración, notificaciones y 
 | Aplicación web | React, Vite | [UMBRA Web](https://github.com/Ixf2/UMBRAJoanaRamirez/tree/develop) |
 | Aplicación móvil | Kotlin, Android Studio | [UMBRA Android](https://github.com/Ixf2/UMBRAAndroid/tree/develop) |
 | Backend | Java, Spring Boot, Maven | [UMBRA Backend](https://github.com/Ixf2/UmbraBackendJoanaRam-rez/tree/develop) |
-| Base de datos | MariaDB, SQL | SQL `umbra` | (https://drive.google.com/file/d/1jVAfkBek3cXsasbAn0mDg8_ejbLLUk1e/view?usp=sharing)
+| Base de datos | MariaDB, SQL | [Script SQL `umbra`](https://drive.google.com/file/d/1jVAfkBek3cXsasbAn0mDg8_ejbLLUk1e/view?usp=sharing) |
 
 ### 4. Arquitectura
 
@@ -72,10 +75,20 @@ En Android se utiliza MVVM para la gestión de personajes:
 ```mermaid
 flowchart LR
     V[Activities / XML / Compose] --> VM[ViewModels]
-    VM --> R[PersonajeRepository]
+    VM --> R[PersonajeRepository / AuthRepository]
     R --> API[Retrofit / API REST]
     VM -->|StateFlow| V
 ```
+
+#### Activities de Android
+
+| Activity | Interfaz / UI | Función / Feature | Requiere sesión / Authentication required |
+| --- | --- | --- | --- |
+| `MainActivity` | XML Views | Inicio de sesión / Login | No |
+| `RegistroActivity` | XML Views | Registro / Registration | No |
+| `BibliotecaActivity` | XML Views | Biblioteca personal y pública / Personal and public library | Sí / Yes |
+| `DetallePersonajeActivity` | XML Views | Ficha y retrato / Character details and portrait | Sí / Yes |
+| `PersonajeActivity` | Jetpack Compose | Creación y edición / Creation and editing | Sí / Yes |
 
 ### 5. Tecnologías
 
@@ -137,16 +150,28 @@ git clone -b develop https://github.com/Ixf2/UMBRAAndroid.git
 4. Para la configuración local usada en el proyecto, ejecutar:
 
 ```bash
+adb devices
 adb reverse tcp:8080 tcp:8080
+adb reverse --list
 ```
 
 La URL base de Retrofit en ese entorno es `http://127.0.0.1:8080/`. El comando requiere que ADB esté disponible y el dispositivo conectado. Ejecutar la aplicación desde Android Studio.
+
+Si ADB no está en el PATH de Windows y el SDK está en su ubicación predeterminada, utilizar PowerShell:
+
+```powershell
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" devices
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" reverse tcp:8080 tcp:8080
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" reverse --list
+```
+
+Opcionalmente, configurar una herramienta externa en Android Studio (Settings → Tools → External Tools), con `adb.exe` como programa y `reverse tcp:8080 tcp:8080` como argumentos. Añadirla a Before Launch de la configuración de ejecución, asegurándose de que el emulador ya está iniciado. Si falla, ejecutar el comando manualmente después de arrancar el emulador. El backend debe ejecutarse en el mismo equipo o máquina virtual que el servidor ADB.
 
 *Nota sobre el entorno ISARD:* El proyecto se ha desarrollado y probado utilizando una máquina virtual Windows alojada en ISARD. Debido a la configuración de red del entorno virtualizado, se ha utilizado ADB Reverse para establecer la comunicación entre el emulador Android y el backend Spring Boot. Esta solución evita depender de una dirección IP específica de la máquina virtual, facilitando la ejecución del proyecto en otros equipos.
 
 ### 7. Capturas del proyecto
 
-Las capturas Android se encuentran referenciadas mediante rutas relativas a `docs/images/` desde la raíz del repositorio. Las evidencias web y backend se incorporarán cuando estén disponibles.
+Las capturas Android se encuentran referenciadas mediante rutas relativas a `docs/images/android/` desde la raíz del repositorio. Las evidencias web y backend se incorporarán cuando estén disponibles.
 
 
 #### Aplicación web
@@ -158,13 +183,21 @@ Las capturas Android se encuentran referenciadas mediante rutas relativas a `doc
 ![Diseño responsive](docs/images/web-responsive.webp)
 -->
 
+
 #### Aplicación Android
 
-##### Inicio de sesión y biblioteca / Login and library
+##### Autenticación y registro / Authentication and registration
 
 <p align="center">
   <img src="docs/images/android/login.png" alt="Inicio de sesión / Login" width="240">
+  <img src="docs/images/android/registro.png" alt="Registro de usuarios / User registration" width="240">
+</p>
+
+##### Biblioteca personal y pública / Personal and public library
+
+<p align="center">
   <img src="docs/images/android/biblioteca.png" alt="Biblioteca personal / Personal library" width="240">
+  <img src="docs/images/android/biblioteca_publica.png" alt="Biblioteca pública / Public library" width="240">
 </p>
 
 ##### Creación y generación / Creation and generation
@@ -195,6 +228,7 @@ Las capturas Android se encuentran referenciadas mediante rutas relativas a `doc
   <img src="docs/images/android/eliminar_personaje.png" alt="Eliminar personaje / Delete character" width="240">
 </p>
 
+
 #### Backend y base de datos
 
 <!--
@@ -224,7 +258,7 @@ Las pruebas finales de integración, permisos y rendimiento forman parte de la r
 
 Proyecto académico en desarrollo. Rama de trabajo: `develop`.
 
-**Estado al 28/11/2026:** implementación funcional Android completada según las pruebas manuales comunicadas; pendientes la auditoría final de Lint y la revisión integral de permisos e integración. En React queda pendiente corregir el guardado de retratos desde Inspiración. La revisión de CSRF y HTTPS sigue pendiente para producción.
+**Estado al 28/11/2026:** Android incorpora el registro de usuarios y las bibliotecas personal y pública, además del CRUD, imágenes y generador. Pendientes la auditoría final de Lint y la revisión integral de registro, permisos e integración entre plataformas. En React queda pendiente corregir el guardado de retratos desde Inspiración. La revisión de CSRF y HTTPS sigue pendiente para producción.
 
 **Autora:** Joana del Pino Ramírez García — [GitHub: Ixf2](https://github.com/Ixf2).
 
@@ -242,7 +276,10 @@ It is developed as an interdisciplinary academic project for the second year of 
 
 ### 2. Features
 
-- Mandatory authentication for access to the library and public or private characters, with login and logout.
+- User registration from Android, with username, email, password and password confirmation validation.
+- Login and logout through Spring Security; authentication is required to browse public or private characters.
+- Tab-based personal and public libraries: manage owned characters and browse public characters from other registered users.
+- The public tab is read-only; editing and deletion are available in the personal library and subject to server-side authorisation.
 - Android session verification through `SessionManager` and non-exported internal activities.
 - Random character generator on Android: editable names, classes, races, origins, backstories, personalities, levels, traits and statistics.
 - PNG, JPEG or WebP portrait selection from the device (up to 5 MiB), preview and replacement.
@@ -251,7 +288,7 @@ It is developed as an interdisciplinary academic project for the second year of 
 - Character names, backstories, personalities, classes, races, origins, levels and statistics.
 - Public or private visibility and character access permissions.
 - Responsive web interface with Spanish and English language support.
-- Native Android application using XML Views and a Jetpack Compose form.
+- Native Android application with five Activities: four using XML Views and one using Jetpack Compose.
 - Form validation, loading states and error messages.
 
 The project roadmap also includes settings, notifications and character-sharing features. Availability depends on the implementation status of each client.
@@ -263,7 +300,7 @@ The project roadmap also includes settings, notifications and character-sharing 
 | Web application | React, Vite | [UMBRA Web](https://github.com/Ixf2/UMBRAJoanaRamirez/tree/develop) |
 | Mobile application | Kotlin, Android Studio | [UMBRA Android](https://github.com/Ixf2/UMBRAAndroid/tree/develop) |
 | Backend | Java, Spring Boot, Maven | [UMBRA Backend](https://github.com/Ixf2/UmbraBackendJoanaRam-rez/tree/develop) |
-| Database | MariaDB, SQL | `umbra` schema |
+| Database | MariaDB, SQL | [SQL script `umbra`](https://drive.google.com/file/d/1jVAfkBek3cXsasbAn0mDg8_ejbLLUk1e/view?usp=sharing) |
 
 ### 4. Architecture
 
@@ -282,10 +319,20 @@ Android character management follows the MVVM pattern:
 ```mermaid
 flowchart LR
     V[Activities / XML / Compose] --> VM[ViewModels]
-    VM --> R[PersonajeRepository]
+    VM --> R[PersonajeRepository / AuthRepository]
     R --> API[Retrofit / REST API]
     VM -->|StateFlow| V
 ```
+
+#### Android Activities
+
+| Activity | Interfaz / UI | Función / Feature | Requiere sesión / Authentication required |
+| --- | --- | --- | --- |
+| `MainActivity` | XML Views | Inicio de sesión / Login | No |
+| `RegistroActivity` | XML Views | Registro / Registration | No |
+| `BibliotecaActivity` | XML Views | Biblioteca personal y pública / Personal and public library | Sí / Yes |
+| `DetallePersonajeActivity` | XML Views | Ficha y retrato / Character details and portrait | Sí / Yes |
+| `PersonajeActivity` | Jetpack Compose | Creación y edición / Creation and editing | Sí / Yes |
 
 ### 5. Technology stack
 
@@ -347,14 +394,28 @@ git clone -b develop https://github.com/Ixf2/UMBRAAndroid.git
 4. For the project's local development setup, run:
 
 ```bash
+adb devices
 adb reverse tcp:8080 tcp:8080
+adb reverse --list
 ```
 
 The Retrofit base URL in this environment is `http://127.0.0.1:8080/`. ADB must be available and the device connected. Run the application from Android Studio.
 
+If ADB is not on the Windows PATH and the SDK is installed in its default location, use PowerShell:
+
+```powershell
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" devices
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" reverse tcp:8080 tcp:8080
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" reverse --list
+```
+
+Optionally, configure an external tool in Android Studio (Settings → Tools → External Tools), using `adb.exe` as the program and `reverse tcp:8080 tcp:8080` as its arguments. Add it to the run configuration's Before Launch tasks, with the emulator already running. If it fails, run the command manually after starting the emulator. The backend must run on the same host or virtual machine as the ADB server.
+
+*ISARD environment note:* Development and testing were carried out in a Windows virtual machine hosted on ISARD. ADB Reverse connects the Android emulator to Spring Boot without depending on a fixed virtual machine IP address.
+
 ### 7. Project screenshots
 
-The screenshots are shared between both language sections. See [the screenshot gallery](#7-capturas-del-proyecto). The Android gallery uses relative paths under `docs/images/`. Web and backend screenshots will be added when available.
+The screenshots are shared between both language sections. See [the screenshot gallery](#7-capturas-del-proyecto). The Android gallery uses relative paths under `docs/images/android/`. Web and backend screenshots will be added when available.
 
 ### 8. Quality, security and sustainability
 
@@ -372,7 +433,7 @@ Final integration, permission and performance tests are part of the pre-delivery
 
 Academic project under development. Working branch: `develop`.
 
-**Status as of 28 November 2026:** Android functional implementation completed according to reported manual tests; final Lint audit and full permissions and integration review remain pending. React Inspiration portrait persistence still needs fixing. CSRF and HTTPS remain production-security review items.
+**Status as of 28 November 2026:** Android includes user registration and personal and public libraries, in addition to CRUD, images and the generator. The final Lint audit and full registration, permissions and cross-platform integration review remain pending. React Inspiration portrait persistence still needs fixing. CSRF and HTTPS remain production-security review items.
 
 **Author:** Joana del Pino Ramírez García — [GitHub: Ixf2](https://github.com/Ixf2).
 
