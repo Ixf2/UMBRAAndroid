@@ -32,7 +32,11 @@ El proyecto se desarrolla como parte del Proyecto Interdisciplinar de 2.º del C
 
 ### 2. Funcionalidades
 
-- Autenticación de usuarios y acceso a la biblioteca personal.
+- Inicio y cierre de sesión obligatorios para acceder a la biblioteca y a los personajes públicos o privados.
+- Verificación de sesión en Android mediante `SessionManager` y protección de las Activities internas.
+- Generador aleatorio de personajes en Android: nombre, clase, raza, origen, historia, personalidad, nivel, rasgos y estadísticas editables antes de guardar.
+- Selección de retratos PNG, JPEG o WebP desde el dispositivo (máximo 5 MiB), vista previa y actualización del retrato.
+- Miniaturas en la biblioteca y retratos de mayor resolución en la ficha; almacenamiento binario WebP en MariaDB.
 - Creación, consulta, edición y eliminación de personajes (CRUD).
 - Gestión de nombre, historia, personalidad, clase, raza, origen, nivel y estadísticas.
 - Visibilidad pública o privada y control de permisos sobre los personajes.
@@ -49,7 +53,7 @@ La evolución del proyecto incluye opciones de configuración, notificaciones y 
 | Aplicación web | React, Vite | [UMBRA Web](https://github.com/Ixf2/UMBRAJoanaRamirez/tree/develop) |
 | Aplicación móvil | Kotlin, Android Studio | [UMBRA Android](https://github.com/Ixf2/UMBRAAndroid/tree/develop) |
 | Backend | Java, Spring Boot, Maven | [UMBRA Backend](https://github.com/Ixf2/UmbraBackendJoanaRam-rez/tree/develop) |
-| Base de datos | MariaDB, SQL | Esquema `umbra` |
+| Base de datos | MariaDB, SQL | SQL `umbra` | (https://drive.google.com/file/d/1jVAfkBek3cXsasbAn0mDg8_ejbLLUk1e/view?usp=sharing)
 
 ### 4. Arquitectura
 
@@ -138,9 +142,11 @@ adb reverse tcp:8080 tcp:8080
 
 La URL base de Retrofit en ese entorno es `http://127.0.0.1:8080/`. El comando requiere que ADB esté disponible y el dispositivo conectado. Ejecutar la aplicación desde Android Studio.
 
+*Nota sobre el entorno ISARD:* El proyecto se ha desarrollado y probado utilizando una máquina virtual Windows alojada en ISARD. Debido a la configuración de red del entorno virtualizado, se ha utilizado ADB Reverse para establecer la comunicación entre el emulador Android y el backend Spring Boot. Esta solución evita depender de una dirección IP específica de la máquina virtual, facilitando la ejecución del proyecto en otros equipos.
+
 ### 7. Capturas del proyecto
 
-Guarda las imágenes en `docs/images/`, junto al README en el repositorio donde lo publiques. Elimina las marcas de comentario HTML que rodean cada imagen cuando hayas añadido el archivo correspondiente.
+Las capturas Android se encuentran referenciadas mediante rutas relativas a `docs/images/` desde la raíz del repositorio. Las evidencias web y backend se incorporarán cuando estén disponibles.
 
 #### Aplicación web
 
@@ -153,14 +159,40 @@ Guarda las imágenes en `docs/images/`, junto al README en el repositorio donde 
 
 #### Aplicación Android
 
-<!--
+##### Inicio de sesión y biblioteca / Login and library
+
 <p align="center">
-  <img src="docs/images/android-login.webp" alt="Inicio de sesión Android" width="220">
-  <img src="docs/images/android-biblioteca.webp" alt="Biblioteca Android" width="220">
-  <img src="docs/images/android-detalle.webp" alt="Detalle Android" width="220">
-  <img src="docs/images/android-formulario.webp" alt="Formulario Compose" width="220">
+  <img src="docs/images/login.png" alt="Inicio de sesión / Login" width="240">
+  <img src="docs/images/biblioteca.png" alt="Biblioteca personal / Personal library" width="240">
 </p>
--->
+
+##### Creación y generación / Creation and generation
+
+<p align="center">
+  <img src="docs/images/creacion_personaje.png" alt="Formulario de creación / Creation form" width="240">
+  <img src="docs/images/generador.png" alt="Generador de personajes / Character generator" width="240">
+</p>
+
+##### Formulario cumplimentado / Completed form
+
+<p align="center">
+  <img src="docs/images/creacion_personaje_relleno.png" alt="Formulario completado 1 / Completed form 1" width="240">
+  <img src="docs/images/creacion_personaje_relleno1.png" alt="Formulario completado 2 / Completed form 2" width="240">
+  <img src="docs/images/creacion_personaje_relleno2.png" alt="Formulario completado 3 / Completed form 3" width="240">
+</p>
+
+<p align="center">
+  <img src="docs/images/creacion_personaje_relleno3.png" alt="Formulario completado 4 / Completed form 4" width="240">
+  <img src="docs/images/creacion_personaje_relleno4.png" alt="Formulario completado 5 / Completed form 5" width="240">
+  <img src="docs/images/creacion_personaje_relleno5.png" alt="Formulario completado 6 / Completed form 6" width="240">
+</p>
+
+##### Edición y eliminación / Editing and deletion
+
+<p align="center">
+  <img src="docs/images/actualizar_personaje.png" alt="Actualizar personaje / Update character" width="240">
+  <img src="docs/images/eliminar_personaje.png" alt="Eliminar personaje / Delete character" width="240">
+</p>
 
 #### Backend y base de datos
 
@@ -173,7 +205,9 @@ Guarda las imágenes en `docs/images/`, junto al README en el repositorio donde 
 
 - Separación de responsabilidades entre interfaz, lógica y persistencia.
 - Validaciones de entrada y control de acceso a operaciones sobre personajes.
-- Optimización de imágenes web mediante WebP.
+- Procesamiento de retratos en el backend: dos versiones WebP almacenadas en `imagen_personaje` (miniatura de hasta 50 KiB y detalle de hasta 250 KiB).
+- Spring Security exige autenticación para consultar personajes e imágenes, incluso públicos. Registro e inicio de sesión siguen abiertos.
+- Pruebas sin credenciales: cuatro endpoints de personajes e imágenes devolvieron HTTP 401 el 28/11/2026.
 - Auditorías con Lighthouse y Android Lint.
 - Recursos de texto Android centralizados y uso de plurales.
 
@@ -187,6 +221,8 @@ Las pruebas finales de integración, permisos y rendimiento forman parte de la r
 ### 9. Estado y autoría
 
 Proyecto académico en desarrollo. Rama de trabajo: `develop`.
+
+**Estado al 28/11/2026:** implementación funcional Android completada según las pruebas manuales comunicadas; pendientes la auditoría final de Lint y la revisión integral de permisos e integración. En React queda pendiente corregir el guardado de retratos desde Inspiración. La revisión de CSRF y HTTPS sigue pendiente para producción.
 
 **Autora:** Joana del Pino Ramírez García — [GitHub: Ixf2](https://github.com/Ixf2).
 
@@ -204,7 +240,11 @@ It is developed as an interdisciplinary academic project for the second year of 
 
 ### 2. Features
 
-- User authentication and access to a personal character library.
+- Mandatory authentication for access to the library and public or private characters, with login and logout.
+- Android session verification through `SessionManager` and non-exported internal activities.
+- Random character generator on Android: editable names, classes, races, origins, backstories, personalities, levels, traits and statistics.
+- PNG, JPEG or WebP portrait selection from the device (up to 5 MiB), preview and replacement.
+- Library thumbnails and higher-resolution detail portraits stored as binary WebP images in MariaDB.
 - Create, read, update and delete characters (CRUD).
 - Character names, backstories, personalities, classes, races, origins, levels and statistics.
 - Public or private visibility and character access permissions.
@@ -312,13 +352,15 @@ The Retrofit base URL in this environment is `http://127.0.0.1:8080/`. ADB must 
 
 ### 7. Project screenshots
 
-The screenshots are shared between both language sections. See [the screenshot gallery](#7-capturas-del-proyecto). Store the images in `docs/images/` and uncomment the image references once the files are available.
+The screenshots are shared between both language sections. See [the screenshot gallery](#7-capturas-del-proyecto). The Android gallery uses relative paths under `docs/images/`. Web and backend screenshots will be added when available.
 
 ### 8. Quality, security and sustainability
 
 - Separation of concerns between the interface, business logic and persistence.
 - Input validation and access control for character operations.
-- Web image optimisation using WebP.
+- Server-side portrait processing: two WebP variants stored in `imagen_personaje` (thumbnail up to 50 KiB and detail up to 250 KiB).
+- Spring Security requires authentication for character and image requests, including public characters. Registration and login remain open.
+- Anonymous-access tests: four character and image endpoints returned HTTP 401 on 28 November 2026.
 - Lighthouse and Android Lint audits.
 - Centralised Android text resources and plural handling.
 
@@ -327,6 +369,8 @@ Final integration, permission and performance tests are part of the pre-delivery
 ### 9. Project status and author
 
 Academic project under development. Working branch: `develop`.
+
+**Status as of 28 November 2026:** Android functional implementation completed according to reported manual tests; final Lint audit and full permissions and integration review remain pending. React Inspiration portrait persistence still needs fixing. CSRF and HTTPS remain production-security review items.
 
 **Author:** Joana del Pino Ramírez García — [GitHub: Ixf2](https://github.com/Ixf2).
 
