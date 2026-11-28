@@ -1,80 +1,124 @@
+
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#101518">
+    android:background="@color/umbra_background">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
         android:padding="24dp">
 
         <TextView
+            style="@style/UmbraTitulo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/app_name"
-            android:textColor="#FFFFFF"
-            android:textSize="36sp"
-            android:textStyle="bold"
+            android:textSize="42sp"
+            android:letterSpacing="0.15"
+            android:fontFamily="serif"
             android:gravity="center"
             android:layout_marginBottom="8dp" />
 
         <TextView
+            style="@style/UmbraTextoSecundario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/textview_biblioteca"
-            android:textColor="#C0C8CC"
             android:textSize="16sp"
             android:gravity="center"
-            android:layout_marginBottom="32dp" />
+            android:layout_marginBottom="40dp" />
+
+        <TextView
+            style="@style/UmbraSubtitulo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_inicioSesión"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            style="@style/UmbraTextoSecundario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_correoElectronico"
+            android:labelFor="@id/etEmail"
+            android:layout_marginBottom="8dp" />
 
         <EditText
             android:id="@+id/etEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/umbra_input_background"
             android:hint="@string/hint_correoElectronico"
             android:inputType="textEmailAddress"
             android:singleLine="true"
             android:autofillHints="emailAddress"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#A8B2B8"
-            android:layout_marginBottom="16dp" />
+            android:textColor="@color/umbra_text"
+            android:textColorHint="@color/umbra_text_secondary"
+            android:textSize="16sp"
+            android:minHeight="56dp"
+            android:imeOptions="actionNext"
+            android:layout_marginBottom="20dp" />
+
+        <TextView
+            style="@style/UmbraTextoSecundario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_contraseña"
+            android:labelFor="@id/etPassword"
+            android:layout_marginBottom="8dp" />
 
         <EditText
             android:id="@+id/etPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/umbra_input_background"
             android:hint="@string/hint_contraseña"
             android:inputType="textPassword"
             android:singleLine="true"
             android:autofillHints="password"
-            android:textColor="#FFFFFF"
-            android:textColorHint="#A8B2B8"
-            android:layout_marginBottom="20dp" />
+            android:textColor="@color/umbra_text"
+            android:textColorHint="@color/umbra_text_secondary"
+            android:textSize="16sp"
+            android:minHeight="56dp"
+            android:imeOptions="actionDone"
+            android:layout_marginBottom="24dp" />
 
         <Button
             android:id="@+id/btnLogin"
+            style="@style/UmbraBotonPrincipal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/button_inicioSesión" />
+            android:text="@string/button_inicioSesión"
+            android:minHeight="56dp" />
 
         <TextView
             android:id="@+id/txtLoginEstado"
+            style="@style/UmbraTextoSecundario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#C4CFD5"
             android:gravity="center"
+            android:accessibilityLiveRegion="polite"
             android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/umbra_border"
             android:layout_marginBottom="24dp" />
 
         <Button
             android:id="@+id/btnBiblioteca"
+            style="@style/UmbraBotonSecundario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/button_continuarInvitado" />
+            android:text="@string/button_continuarInvitado"
+            android:minHeight="56dp" />
 
     </LinearLayout>
 

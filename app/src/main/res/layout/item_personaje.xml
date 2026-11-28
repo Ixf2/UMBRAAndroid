@@ -3,40 +3,49 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    android:background="#242C32"
+    android:background="@drawable/umbra_card_background"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="18dp">
 
     <TextView
         android:id="@+id/txtNombrePersonaje"
+        style="@style/UmbraTitulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:fontFamily="serif"
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/txtClaseRaza"
+        style="@style/UmbraTexto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:textColor="#C4CFD5"
         android:textSize="15sp" />
 
     <TextView
         android:id="@+id/txtNivelVisibilidad"
+        style="@style/UmbraTextoSecundario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:textColor="#C4CFD5"
-        android:textSize="14sp" />
+        android:layout_marginTop="6dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/umbra_border"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp" />
 
     <TextView
         android:id="@+id/txtEstadisticas"
+        style="@style/UmbraTexto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:textColor="#FFFFFF"
-        android:textSize="13sp" />
+        android:textSize="13sp"
+        android:lineSpacingExtra="4dp" />
 
 </LinearLayout>

@@ -3,32 +3,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#101518"
+    android:background="@color/umbra_background"
     android:padding="20dp">
 
     <TextView
-        android:id="@+id/tituloBiblioteca"
+        style="@style/UmbraTitulo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="@string/textview_BibliotecaUmbra"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:text="@string/app_name"
+        android:textSize="32sp"
+        android:fontFamily="serif"
+        android:letterSpacing="0.15"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/umbra_border"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/tituloBiblioteca"
+        style="@style/UmbraSubtitulo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="@string/textview_BibliotecaUmbra" />
 
     <TextView
         android:id="@+id/txtEstado"
+        style="@style/UmbraTextoSecundario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="@string/textview_pulsar_button_para_cargar"
-        android:textColor="#C4CFD5" />
+        android:layout_marginBottom="16dp"
+        android:accessibilityLiveRegion="polite"
+        android:text="@string/textview_pulsar_button_para_cargar" />
 
     <Button
         android:id="@+id/btnCargarPersonajes"
+        style="@style/UmbraBotonSecundario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_cargar_personajes" />
+        android:text="@string/button_cargar_personajes"
+        android:layout_marginBottom="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerPersonajes"
@@ -39,21 +57,34 @@
         android:paddingTop="8dp"
         android:paddingBottom="12dp" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/umbra_border"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp" />
+
     <Button
         android:id="@+id/btnCrearPersonaje"
+        style="@style/UmbraBotonPrincipal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_crear_personaje"
+        android:minHeight="56dp"
+        android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
     <Button
         android:id="@+id/btnVolver"
+        style="@style/UmbraBotonSecundario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_volver_inicio" />
+        android:text="@string/button_volver_inicio"
+        android:layout_marginBottom="8dp" />
 
     <Button
         android:id="@+id/btnCerrarSesion"
+        style="@style/UmbraBotonSecundario"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_cerrar_sesion"
@@ -61,6 +92,7 @@
 
     <Button
         android:id="@+id/btnIrLogin"
+        style="@style/UmbraBotonPrincipal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_ir_login"

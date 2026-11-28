@@ -1,6 +1,7 @@
 
 package com.example.umbra.activities
 
+import com.example.umbra.ui.theme.UmbraTheme
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,7 +22,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,7 +57,7 @@ class PersonajeActivity : ComponentActivity() {
         viewModel.cargarPersonaje(idPersonaje)
 
         setContent {
-            MaterialTheme(colorScheme = darkColorScheme()) {
+            UmbraTheme {
 
                 val personaje by viewModel.personaje.collectAsState()
                 val cargando by viewModel.cargando.collectAsState()
