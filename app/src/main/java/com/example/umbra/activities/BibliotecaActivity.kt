@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.umbra.R
 import com.example.umbra.adapters.PersonajeAdapter
 import com.example.umbra.network.RetrofitClient
+import com.example.umbra.utils.SessionManager
 import com.example.umbra.viewmodel.PersonajeViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -27,37 +28,50 @@ class BibliotecaActivity : AppCompatActivity() {
 
   private lateinit var viewModel: PersonajeViewModel
   private lateinit var btnCargar: Button
+  private lateinit var btnCrear: Button
+  private lateinit var btnCerrarSesion: Button
   private lateinit var txtEstado: TextView
+  private lateinit var recycler: RecyclerView
 
-  private var mostrarMisPersonajes = false
+  private var sesionValidada = false
+  private var cerrandoSesion = false
+  private var verificandoSesion = false
 
   private val crearPersonajeLauncher = registerForActivityResult(
     ActivityResultContracts.StartActivityForResult()
   ) { resultado ->
+
     if (resultado.resultCode == RESULT_OK) {
-      cargarPersonajes()
+      verificarSesion()
     }
   }
 
   private val adapter = PersonajeAdapter(
     onPersonajeClick = { personaje ->
 
-      val intent = Intent(
-        this,
-        DetallePersonajeActivity::class.java
-      )
+      if (
+        sesionValidada &&
+        !cerrandoSesion &&
+        !verificandoSesion
+      ) {
 
-      intent.putExtra(
-        "idPersonaje",
-        personaje.idPersonaje
-      )
+        val intent = Intent(
+          this,
+          DetallePersonajeActivity::class.java
+        )
 
-      intent.putExtra(
-        "puedeEditar",
-        mostrarMisPersonajes
-      )
+        intent.putExtra(
+          "idPersonaje",
+          personaje.idPersonaje
+        )
 
-      crearPersonajeLauncher.launch(intent)
+        intent.putExtra(
+          "puedeEditar",
+          true
+        )
+
+        crearPersonajeLauncher.launch(intent)
+      }
     }
   )
 
@@ -71,84 +85,125 @@ class BibliotecaActivity : AppCompatActivity() {
     ]
 
     btnCargar = findViewById(R.id.btnCargarPersonajes)
+    btnCrear = findViewById(R.id.btnCrearPersonaje)
+    btnCerrarSesion = findViewById(R.id.btnCerrarSesion)
     txtEstado = findViewById(R.id.txtEstado)
+    recycler = findViewById(R.id.recyclerPersonajes)
 
-    val btnVolver = findViewById<Button>(R.id.btnVolver)
-    val btnIrLogin = findViewById<Button>(R.id.btnIrLogin)
-    val btnCerrarSesion = findViewById<Button>(R.id.btnCerrarSesion)
-    val btnCrear = findViewById<Button>(R.id.btnCrearPersonaje)
-    val titulo = findViewById<TextView>(R.id.tituloBiblioteca)
-    val recycler = findViewById<RecyclerView>(R.id.recyclerPersonajes)
-
-    mostrarMisPersonajes = intent.getBooleanExtra(
-      "mostrarMisPersonajes",
-      false
+    val titulo = findViewById<TextView>(
+      R.id.tituloBiblioteca
     )
 
-    titulo.text = if (mostrarMisPersonajes) {
-      getString(R.string.biblioteca_mis_personajes)
-    } else {
-      getString(R.string.biblioteca_publica)
-    }
+    titulo.text = getString(
+      R.string.biblioteca_mis_personajes
+    )
 
-    btnCargar.text = if (mostrarMisPersonajes) {
-      getString(R.string.biblioteca_cargar_mios)
-    } else {
-      getString(R.string.button_cargar_personajesPublicos)
-    }
+    btnCargar.text = getString(
+      R.string.biblioteca_cargar_mios
+    )
 
-    btnIrLogin.visibility =
-      if (mostrarMisPersonajes) View.GONE else View.VISIBLE
-
-    btnCerrarSesion.visibility =
-      if (mostrarMisPersonajes) View.VISIBLE else View.GONE
-
-    btnCrear.visibility =
-      if (mostrarMisPersonajes) View.VISIBLE else View.GONE
+    btnCrear.visibility = View.VISIBLE
+    btnCerrarSesion.visibility = View.VISIBLE
+    recycler.visibility = View.INVISIBLE
 
     recycler.layoutManager = LinearLayoutManager(this)
     recycler.adapter = adapter
 
+    actualizarBotones()
     observarViewModel()
 
     btnCargar.setOnClickListener {
-      cargarPersonajes()
+      verificarSesion()
     }
 
     btnCrear.setOnClickListener {
 
-      val intent = Intent(
-        this,
-        PersonajeActivity::class.java
-      )
+      if (
+        sesionValidada &&
+        !cerrandoSesion &&
+        !verificandoSesion
+      ) {
 
-      crearPersonajeLauncher.launch(intent)
-    }
+        val intent = Intent(
+          this,
+          PersonajeActivity::class.java
+        )
 
-    btnVolver.setOnClickListener {
-      finish()
-    }
-
-    btnIrLogin.setOnClickListener {
-
-      val intent = Intent(
-        this,
-        MainActivity::class.java
-      )
-
-      intent.flags =
-        Intent.FLAG_ACTIVITY_CLEAR_TOP or
-            Intent.FLAG_ACTIVITY_SINGLE_TOP
-
-      startActivity(intent)
-      finish()
+        crearPersonajeLauncher.launch(intent)
+      }
     }
 
     btnCerrarSesion.setOnClickListener {
-      cerrarSesion(btnCerrarSesion)
+      cerrarSesion()
     }
+  }
 
-    cargarPersonajes()
+  override fun onStart() {
+    super.onStart()
+    verificarSesion()
+  }
+
+  private fun verificarSesion() {
+
+    if (verificandoSesion || cerrandoSesion) return
+
+    lifecycleScope.launch {
+
+      verificandoSesion = true
+      sesionValidada = false
+
+      recycler.visibility = View.INVISIBLE
+
+      actualizarBotones()
+
+      txtEstado.text = getString(
+        R.string.estado_verificando_sesion
+      )
+
+      try {
+
+        when (SessionManager.verificarSesion()) {
+
+          SessionManager.EstadoSesion.AUTENTICADA -> {
+
+            sesionValidada = true
+
+            recycler.visibility = View.VISIBLE
+
+            cargarPersonajes()
+          }
+
+          SessionManager.EstadoSesion.NO_AUTENTICADA -> {
+
+            adapter.actualizarPersonajes(emptyList())
+
+            SessionManager.volverLogin(
+              this@BibliotecaActivity
+            )
+          }
+
+          SessionManager.EstadoSesion.ERROR_CONEXION -> {
+
+            txtEstado.text = getString(
+              R.string.sesion_error_conexion
+            )
+          }
+
+          SessionManager.EstadoSesion.ERROR_SERVIDOR -> {
+
+            txtEstado.text = getString(
+              R.string.sesion_error_servidor
+            )
+          }
+        }
+
+      } finally {
+
+        verificandoSesion = false
+
+        actualizarBotones()
+      }
+    }
   }
 
   private fun observarViewModel() {
@@ -158,35 +213,74 @@ class BibliotecaActivity : AppCompatActivity() {
       repeatOnLifecycle(Lifecycle.State.STARTED) {
 
         launch {
+
           viewModel.personajes.collect { personajes ->
-            adapter.actualizarPersonajes(personajes)
+
+            if (sesionValidada && !cerrandoSesion) {
+
+              adapter.actualizarPersonajes(personajes)
+            }
           }
         }
 
         launch {
+
           viewModel.mensaje.collect { mensaje ->
-            txtEstado.text = mensaje
+
+            if (sesionValidada && !cerrandoSesion) {
+
+              txtEstado.text = mensaje
+            }
           }
         }
 
         launch {
-          viewModel.cargando.collect { cargando ->
-            btnCargar.isEnabled = !cargando
+
+          viewModel.cargando.collect {
+
+            actualizarBotones()
           }
         }
       }
     }
   }
 
-  private fun cargarPersonajes() {
-    viewModel.cargarPersonajes(mostrarMisPersonajes)
+  private fun actualizarBotones() {
+
+    val disponible =
+      sesionValidada &&
+          !cerrandoSesion &&
+          !verificandoSesion &&
+          !viewModel.cargando.value
+
+    btnCargar.isEnabled =
+      !cerrandoSesion &&
+          !verificandoSesion &&
+          !viewModel.cargando.value
+
+    btnCrear.isEnabled = disponible
+
+    btnCerrarSesion.isEnabled =
+      !cerrandoSesion && !verificandoSesion
   }
 
-  private fun cerrarSesion(btnCerrarSesion: Button) {
+  private fun cargarPersonajes() {
+
+    if (sesionValidada && !cerrandoSesion) {
+
+      viewModel.cargarPersonajes(true)
+    }
+  }
+
+  private fun cerrarSesion() {
+
+    if (cerrandoSesion || verificandoSesion) return
 
     lifecycleScope.launch {
 
-      btnCerrarSesion.isEnabled = false
+      cerrandoSesion = true
+
+      actualizarBotones()
 
       txtEstado.text = getString(
         R.string.estado_cerrando_sesion
@@ -196,21 +290,24 @@ class BibliotecaActivity : AppCompatActivity() {
 
         val respuesta = api.logout()
 
-        if (respuesta.isSuccessful) {
+        if (
+          respuesta.isSuccessful ||
+          respuesta.code() == 401
+        ) {
 
-          val intent = Intent(
-            this@BibliotecaActivity,
-            MainActivity::class.java
+          sesionValidada = false
+
+          recycler.visibility = View.INVISIBLE
+
+          adapter.actualizarPersonajes(emptyList())
+
+          SessionManager.volverLogin(
+            this@BibliotecaActivity
           )
 
-          intent.flags =
-            Intent.FLAG_ACTIVITY_NEW_TASK or
-                Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-          startActivity(intent)
-          finish()
-
         } else {
+
+          respuesta.errorBody()?.close()
 
           txtEstado.text = getString(
             R.string.estado_error_cerrar_sesion,
@@ -231,7 +328,9 @@ class BibliotecaActivity : AppCompatActivity() {
 
       } finally {
 
-        btnCerrarSesion.isEnabled = true
+        cerrandoSesion = false
+
+        actualizarBotones()
       }
     }
   }

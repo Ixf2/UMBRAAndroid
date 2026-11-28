@@ -74,13 +74,6 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
-    <Button
-        android:id="@+id/btnVolver"
-        style="@style/UmbraBotonSecundario"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_volver_inicio"
-        android:layout_marginBottom="8dp" />
 
     <Button
         android:id="@+id/btnCerrarSesion"

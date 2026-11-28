@@ -13,11 +13,11 @@
     <string name="hint_contraseña">Contraseña</string>
     <string name="button_inicioSesión">Iniciar sesión</string>
     <string name="button_continuarInvitado">Continuar como invitado</string>
-    <string name="button_volver_inicio">Volver al inicio</string>
     <string name="button_ir_login">Iniciar sesión</string>
     <string name="button_cerrar_sesion">Cerrar sesión</string>
     <string name="button_crear_personaje">Crear personaje</string>
     <string name="button_cargar_personajes">Cargar personajes</string>
+    <string name="estado_verificando_sesion">Verificando sesión…</string>
 
     <string name="biblioteca_mis_personajes">Mis personajes de UMBRA</string>
     <string name="biblioteca_publica">Biblioteca pública de UMBRA</string>
@@ -108,5 +108,10 @@
     <string name="detalle_inteligencia">Inteligencia</string>
     <string name="detalle_carisma">Carisma</string>
     <string name="detalle_retrato_descripcion">Retrato de %1$s</string>
+
+    <string name="sesion_error_conexion">No se ha podido verificar la sesión. Comprueba tu conexión e inténtalo de nuevo.</string>
+    <string name="sesion_error_servidor">No se ha podido verificar la sesión con el servidor. Inténtalo de nuevo.</string>
+
+    <string name="sesion_reintentar">Reintentar</string>
 
 </resources>

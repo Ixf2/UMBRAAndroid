@@ -16,7 +16,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.umbra.R
 import com.example.umbra.models.Personaje
+import com.example.umbra.utils.SessionManager
 import com.example.umbra.viewmodel.DetallePersonajeViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class DetallePersonajeActivity : AppCompatActivity() {
@@ -31,13 +34,15 @@ class DetallePersonajeActivity : AppCompatActivity() {
 
   private var idPersonaje = -1
   private var puedeEditar = false
+  private var sesionValidada = false
+  private var trabajoSesion: Job? = null
 
   private val editarLauncher = registerForActivityResult(
     ActivityResultContracts.StartActivityForResult()
   ) { resultado ->
     if (resultado.resultCode == Activity.RESULT_OK) {
       setResult(Activity.RESULT_OK)
-      viewModel.cargarPersonaje(idPersonaje)
+      if (sesionValidada) viewModel.cargarPersonaje(idPersonaje)
     }
   }
 
@@ -59,13 +64,14 @@ class DetallePersonajeActivity : AppCompatActivity() {
 
     val btnVolver = findViewById<Button>(R.id.btnVolverDetalle)
 
+    contenidoDetalle.visibility = View.GONE
     btnEditar.visibility = View.GONE
     btnEliminar.visibility = View.GONE
 
     btnVolver.setOnClickListener { finish() }
 
     btnEditar.setOnClickListener {
-      if (puedeEditar && idPersonaje > 0) {
+      if (sesionValidada && puedeEditar && idPersonaje > 0) {
         val intent = Intent(this, PersonajeActivity::class.java)
         intent.putExtra("idPersonaje", idPersonaje)
         editarLauncher.launch(intent)
@@ -73,7 +79,7 @@ class DetallePersonajeActivity : AppCompatActivity() {
     }
 
     btnEliminar.setOnClickListener {
-      if (puedeEditar && idPersonaje > 0) {
+      if (sesionValidada && puedeEditar && idPersonaje > 0) {
         confirmarEliminacion()
       }
     }
@@ -85,8 +91,47 @@ class DetallePersonajeActivity : AppCompatActivity() {
 
     observarViewModel()
 
-    if (viewModel.personaje.value == null && !viewModel.cargando.value) {
-      viewModel.cargarPersonaje(idPersonaje)
+  }
+
+  override fun onStart() {
+    super.onStart()
+    if (idPersonaje > 0) verificarSesion()
+  }
+
+  override fun onStop() {
+    trabajoSesion?.cancel()
+    sesionValidada = false
+    contenidoDetalle.visibility = View.GONE
+    actualizarBotones()
+    super.onStop()
+  }
+
+  private fun verificarSesion() {
+    trabajoSesion?.cancel()
+    sesionValidada = false
+    contenidoDetalle.visibility = View.GONE
+    actualizarBotones()
+    txtEstado.text = getString(R.string.estado_verificando_sesion)
+
+    trabajoSesion = lifecycleScope.launch {
+      when (SessionManager.verificarSesion()) {
+        SessionManager.EstadoSesion.AUTENTICADA -> {
+          viewModel.cargando.first { !it }
+          viewModel.eliminando.first { !it }
+          sesionValidada = true
+          viewModel.cargarPersonaje(idPersonaje)
+          txtEstado.text = viewModel.mensaje.value
+        }
+        SessionManager.EstadoSesion.NO_AUTENTICADA -> {
+          SessionManager.volverLogin(this@DetallePersonajeActivity)
+        }
+        SessionManager.EstadoSesion.ERROR_CONEXION -> {
+          txtEstado.text = getString(R.string.sesion_error_conexion)
+        }
+        SessionManager.EstadoSesion.ERROR_SERVIDOR -> {
+          txtEstado.text = getString(R.string.sesion_error_servidor)
+        }
+      }
     }
   }
 
@@ -95,7 +140,7 @@ class DetallePersonajeActivity : AppCompatActivity() {
       repeatOnLifecycle(Lifecycle.State.STARTED) {
         launch {
           viewModel.personaje.collect { personaje ->
-            if (personaje != null) {
+            if (sesionValidada && personaje != null) {
               mostrarPersonaje(personaje)
             } else {
               contenidoDetalle.visibility = View.GONE
@@ -115,7 +160,7 @@ class DetallePersonajeActivity : AppCompatActivity() {
 
         launch {
           viewModel.mensaje.collect { mensaje ->
-            txtEstado.text = mensaje
+            if (sesionValidada) txtEstado.text = mensaje
           }
         }
 
@@ -135,7 +180,7 @@ class DetallePersonajeActivity : AppCompatActivity() {
   }
 
   private fun actualizarBotones() {
-    val disponible = viewModel.personaje.value != null &&
+    val disponible = sesionValidada && viewModel.personaje.value != null &&
         !viewModel.cargando.value && !viewModel.eliminando.value
 
     val visible = puedeEditar && disponible
@@ -175,6 +220,7 @@ class DetallePersonajeActivity : AppCompatActivity() {
   }
 
   private fun actualizarRetrato() {
+    if (!sesionValidada) return
     val personaje = viewModel.personaje.value ?: return
     val bitmap = viewModel.imagenDetalle.value
 
@@ -228,6 +274,7 @@ class DetallePersonajeActivity : AppCompatActivity() {
   }
 
   private fun eliminarPersonaje() {
+    if (!sesionValidada || !puedeEditar) return
     lifecycleScope.launch {
       val eliminado = viewModel.eliminarPersonaje(idPersonaje)
 

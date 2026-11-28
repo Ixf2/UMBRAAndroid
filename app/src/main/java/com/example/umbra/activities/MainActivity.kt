@@ -137,11 +137,7 @@ class MainActivity : AppCompatActivity() {
       BibliotecaActivity::class.java
     )
 
-    intent.putExtra(
-      "mostrarMisPersonajes",
-      true
-    )
-
     startActivity(intent)
+    finish()
   }
 }
